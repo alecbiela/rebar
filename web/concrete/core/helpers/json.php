@@ -15,6 +15,11 @@
  * @copyright  Copyright (c) 2003-2008 Concrete5. (http://www.concrete5.org)
  * @license    http://www.concrete5.org/license/     MIT License
  */
+
+/*
+ * We don't really need this helper anymore, but it's so ingrained in the core that the functions have just been reduced to stubs
+ * Since min PHP version will eventually be 7 or 8, JSON is definitely baked in already.
+ */
 defined('C5_EXECUTE') or die("Access Denied.");
 class Concrete5_Helper_Json {
 
@@ -26,13 +31,7 @@ class Concrete5_Helper_Json {
 	 * @return mixed
 	 */
 	public function decode($string, $assoc = false) {
-		if (function_exists('json_decode')) {
-			return json_decode($string, $assoc);
-		} else {
-			Loader::library('3rdparty/JSON/JSON');
-			$sjs = new Services_JSON($assoc ? SERVICES_JSON_LOOSE_TYPE : 0);
-			return $sjs->decode($string);
-		}
+		return json_decode($string, $assoc);
 	}
 	
 	
@@ -42,15 +41,6 @@ class Concrete5_Helper_Json {
 	 * @return string
 	 */
 	public function encode($mixed) {
-		if (function_exists('json_encode')) {
 			return json_encode($mixed);
-		} else {
-			Loader::library('3rdparty/JSON/JSON');
-			$sjs = new Services_JSON();
-			return $sjs->encode($mixed);
-		}
 	}
-	
-
-
 }
