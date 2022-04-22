@@ -11,7 +11,8 @@
         "doctrine/orm": "2.13.x-dev",
         "symfony/proxy-manager-bridge": "5.4.x-dev",
         "symfony/translation": "5.4.x-dev",
-        "james-heinrich/getid3": "2.0.x-dev"
+        "james-heinrich/getid3": "2.0.x-dev",
+        "simplepie/simplepie": "dev-master"
     },
     "license": "MIT",
     "authors": [

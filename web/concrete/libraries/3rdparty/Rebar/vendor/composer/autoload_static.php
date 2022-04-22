@@ -59,6 +59,7 @@ class ComposerStaticInit61f909741eae80390d921e7543e30aeb
             'Symfony\\Bundle\\FrameworkBundle\\' => 31,
             'Symfony\\Bridge\\ProxyManager\\' => 28,
             'Symfony\\Bridge\\Doctrine\\' => 24,
+            'SimplePie\\' => 10,
         ),
         'P' => 
         array (
@@ -245,6 +246,10 @@ class ComposerStaticInit61f909741eae80390d921e7543e30aeb
         array (
             0 => __DIR__ . '/..' . '/symfony/doctrine-bridge',
         ),
+        'SimplePie\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/simplepie/simplepie/src',
+        ),
         'Psr\\Log\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
@@ -345,6 +350,16 @@ class ComposerStaticInit61f909741eae80390d921e7543e30aeb
         ),
     );
 
+    public static $prefixesPsr0 = array (
+        'S' => 
+        array (
+            'SimplePie' => 
+            array (
+                0 => __DIR__ . '/..' . '/simplepie/simplepie/library',
+            ),
+        ),
+    );
+
     public static $classMap = array (
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
@@ -362,6 +377,7 @@ class ComposerStaticInit61f909741eae80390d921e7543e30aeb
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit61f909741eae80390d921e7543e30aeb::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit61f909741eae80390d921e7543e30aeb::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit61f909741eae80390d921e7543e30aeb::$prefixesPsr0;
             $loader->classMap = ComposerStaticInit61f909741eae80390d921e7543e30aeb::$classMap;
 
         }, null, ClassLoader::class);

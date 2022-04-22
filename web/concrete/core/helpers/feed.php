@@ -17,11 +17,10 @@
  */
 
 defined('C5_EXECUTE') or die("Access Denied.");
-class Concrete5_Helper_Feed {
 
-	public function __construct() {
-		Loader::library("3rdparty/simplepie");
-	}
+use SimplePie;
+
+class Concrete5_Helper_Feed {
 	
 	/**
 	 * Loads a newsfeed object.
@@ -34,6 +33,5 @@ class Concrete5_Helper_Feed {
 		$feed->set_cache_location(DIR_FILES_CACHE);
 		return $feed;
 	}
-	
 	
 }

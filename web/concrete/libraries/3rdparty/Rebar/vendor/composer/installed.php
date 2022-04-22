@@ -291,6 +291,17 @@
                 0 => '1.0|2.0',
             ),
         ),
+        'simplepie/simplepie' => array(
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../simplepie/simplepie',
+            'aliases' => array(
+                0 => '9999999-dev',
+            ),
+            'reference' => '2bdbc51ed1010941c9c5f2cddca433e79665bfe1',
+            'dev_requirement' => false,
+        ),
         'symfony/cache' => array(
             'pretty_version' => '5.4.x-dev',
             'version' => '5.4.9999999.9999999-dev',
