@@ -1,0 +1,29 @@
+{
+    "name": "abwebdev/rebar",
+    "description": "A reimagination of the legacy Concrete5 CMS using modern technologies",
+    "type": "library",
+    "require": {
+        "symfony/skeleton": "^5.4",
+        "symfony/mailer": "5.4.x-dev",
+        "symfony/http-client": "5.4.x-dev",
+        "doctrine/doctrine-bundle": "2.7.x-dev",
+        "doctrine/doctrine-migrations-bundle": "3.3.x-dev",
+        "doctrine/orm": "2.13.x-dev",
+        "symfony/proxy-manager-bridge": "5.4.x-dev",
+        "symfony/translation": "5.4.x-dev",
+        "james-heinrich/getid3": "2.0.x-dev"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alec Bielanos",
+            "email": "alec.bielanos@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": true
+        }
+    }
+}

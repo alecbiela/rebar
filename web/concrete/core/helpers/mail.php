@@ -1,13 +1,5 @@
 <?php
 /**
- * @package Helpers
- * @category Concrete
- * @author Andrew Embler <andrew@concrete5.org>
- * @copyright  Copyright (c) 2003-2008 Concrete5. (http://www.concrete5.org)
- * @license    http://www.concrete5.org/license/     MIT License
- */
-
-/**
  * Functions used to send mail in Concrete.
  * @package Helpers
  * @category Concrete
@@ -15,8 +7,18 @@
  * @copyright  Copyright (c) 2003-2008 Concrete5. (http://www.concrete5.org)
  * @license    http://www.concrete5.org/license/     MIT License
  */
- 
+
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+
 defined('C5_EXECUTE') or die("Access Denied.");
+
+
 class Concrete5_Helper_Mail {
 
 	protected $headers = array();
@@ -30,7 +32,146 @@ class Concrete5_Helper_Mail {
 	protected $template = ''; 
 	protected $bodyHTML = false;
 	protected $testing = false;
+
+		
+	/**
+	 * Manually set the message's subject
+	 * @param string $subject
+	 * @return void
+	 */
+	public function setSubject($subject){$this->subject = $subject;}
+
+	/**
+	 * Returns the message's subject
+	 * @return string
+	 */
+	public function getSubject(){return $this->subject;}
+
+	/**
+	 * Manually set the text body of a mail message, typically the body is set in the template + load method
+	 * @param string $body
+	 * @return void
+	 */
+	public function setBody($body){$this->body = $body;}
 	
+	/**
+	 * Returns the message's text body
+	 * @return string
+	 */
+	public function getBody(){return $this->body;}
+
+	/**
+	 * manually set the HTML portion of a MIME encoded message, can also be done by setting $bodyHTML in a mail template
+	 * @param string $html
+	 * @return void
+	 */
+	public function setBodyHTML($html){$this->bodyHTML = $html;}
+	
+	/**
+	 * Returns the message's html body
+	 * @return string
+	 */
+	public function getBodyHTML(){return $this->bodyHTML;}
+
+	/** Set the testing state (if true the email logging never occurs and sending errors will throw an exception)
+	* @param bool $testing
+	*/
+	public function setTesting($testing){$this->testing = $testing ? true : false;}
+
+	/** Retrieve the testing state
+	* @return boolean
+	*/
+	public function getTesting(){return $this->testing;}
+
+	/** 
+	 * Sets a text header on the email about to be sent out.
+	 * @param string $header
+	 * @param string $value
+	 * @return void
+	 */
+	public function header($header, $value) {
+		$this->headers[] = array($header, $value);
+	}
+
+	/** 
+	 * Sets the from address on the email about to be sent out.
+	 * @param string $email
+	 * @param string $name
+	 * @return void
+	 */
+	public function from($email, $name = '') {
+		$this->from = new Address($email, $name);
+	}
+	
+	/** 
+	 * Sets to the to email address on the email about to be sent out.
+	 * @param string $email
+	 * @param string $name
+	 * @return void
+	 */
+	public function to($email, $name = '') {
+		if (strpos($email, ',') > 0) {
+			$email = explode(',', $email);
+			foreach($email as $em) {
+				$this->to[] = new Address($em, $name);
+			}
+		} else {
+			$this->to[] = new Address($email, $name);	
+		}
+	}
+	
+	/**
+	 * Adds an email address to the cc field on the email about to be sent out.
+	 * @param string $email
+	 * @param string $name
+	 * @return void
+	 * @since 5.5.1
+	*/
+	public function cc($email, $name = '') {
+		if (strpos($email, ',') > 0) {
+			$email = explode(',', $email);
+			foreach($email as $em) {
+				$this->cc[] = new Address($em, $name);
+			}
+		} else {
+			$this->cc[] = new Address($email, $name);	
+		}
+	}
+	
+	/**
+	 * Adds an email address to the bcc field on the email about to be sent out.
+	 * @param string $email
+	 * @param string $name
+	 * @return void
+	 * @since 5.5.1
+	*/
+	public function bcc($email, $name = '') {
+		if (strpos($email, ',') > 0) {
+			$email = explode(',', $email);
+			foreach($email as $em) {
+				$this->bcc[] = new Address($em, $name);
+			}
+		} else {
+			$this->bcc[] = new Address($email, $name);	
+		}
+	}
+
+	/*	
+	 * Sets the reply-to address on the email about to be sent out
+	 * @param string $email
+	 * @param string $name
+	 * @return void
+	 */
+	public function replyto($email, $name = '') {
+		if (strpos($email, ',') > 0) {
+			$email = explode(',', $email);
+			foreach($email as $em) {
+				$this->replyto[] = new Address($em, $name);
+			}
+		} else {
+			$this->replyto[] = new Address($email, $name);	
+		}
+	}
 	
 	/**
 	 * this method is called by the Loader::helper to clean up the instance of this object
@@ -52,45 +193,32 @@ class Concrete5_Helper_Mail {
 		$this->testing = false;
 	}
 	
-	
 	/**
 	 * @todo documentation
-	 * @return array <Zend_Mail_Transport_Smtp, Zend_Mail>
+	 * @return Symfony\Component\Mailer\Mailer
 	*/
 	public static function getMailerObject(){
-		Loader::library('3rdparty/Zend/Mail');
-		$response = array();
-		$response['mail'] = new Zend_Mail(APP_CHARSET);
-	
+
 		if (MAIL_SEND_METHOD == "SMTP") {
-			Loader::library('3rdparty/Zend/Mail/Transport/Smtp');
-			$config = array();
-			
-			$username = Config::get('MAIL_SEND_METHOD_SMTP_USERNAME');
-			$password = Config::get('MAIL_SEND_METHOD_SMTP_PASSWORD');
-			if ($username != '') {
-				$config['auth'] = 'login';
-				$config['username'] = $username;
-				$config['password'] = $password;
-			}
-			
+			$user = Config::get('MAIL_SEND_METHOD_SMTP_USERNAME');
+			$pass = Config::get('MAIL_SEND_METHOD_SMTP_PASSWORD');
+			$serv = Config::get('MAIL_SEND_METHOD_SMTP_SERVER');
 			$port = Config::get('MAIL_SEND_METHOD_SMTP_PORT');
-			if ($port != '') {
-				$config['port'] = $port;
-			}
-			
-			$encr = Config::get('MAIL_SEND_METHOD_SMTP_ENCRYPTION');
+
+			/*$encr = Config::get('MAIL_SEND_METHOD_SMTP_ENCRYPTION');
 			if ($encr != '') {
-				$config['ssl'] = $encr;
+				//stub: implement "use SSL" checkbox here (does it matter anymore?)
+			}*/
+
+			if($user != '' && $pass != '' && $serv != '' && $port != ''){
+				$dsn = 'smtp://' . $user . ':' . $pass . '@' . $serv . ':' . $port;
+				$transport = Transport::fromDsn($dsn);
+				return new Mailer($transport);
 			}
-			$transport = new Zend_Mail_Transport_Smtp(
-				Config::get('MAIL_SEND_METHOD_SMTP_SERVER'), $config
-			);					
-			
-			$response['transport'] = $transport;
-		}	
-		
-		return $response;		
+		}
+
+		$transport = Transport::fromDsn("native://default");
+		return new Mailer($transport);		
 	}
 	
 	/** 
@@ -135,51 +263,6 @@ class Concrete5_Helper_Mail {
 	}
 	
 	/**
-	 * Manually set the text body of a mail message, typically the body is set in the template + load method
-	 * @param string $body
-	 * @return void
-	 */
-	public function setBody($body){
-		$this->body = $body;
-	}
-	
-	/**
-	 * Manually set the message's subject
-	 * @param string $subject
-	 * @return void
-	 */
-	public function setSubject($subject){
-		$this->subject = $subject;
-	}	
-	
-	/**
-	 * Returns the message's subject
-	 * @return string
-	 */
-	public function getSubject() {return $this->subject;}
-	
-	/**
-	 * Returns the message's text body
-	 * @return string
-	 */
-	public function getBody() {return $this->body;}
-	
-	/**
-	 * Returns the message's html body
-	 * @return string
-	 */
-	public function getBodyHTML() {return $this->bodyHTML;}
-	
-	/**
-	 * manually set the HTML portion of a MIME encoded message, can also be done by setting $bodyHTML in a mail template
-	 * @param string $html
-	 * @return void
-	 */
-	public function setBodyHTML($html) {
-		$this->bodyHTML = $html;
-	}
-	
-	/**
 	 * @param MailImporter $importer
 	 * @param array $data
 	 * @return void
@@ -191,7 +274,7 @@ class Concrete5_Helper_Mail {
 		$this->from($importer->getMailImporterEmail());
 		$this->body = $importer->setupBody($this->body);		
 	}
-	
+
 	/**
 	 * @param array $arr
 	 * @return string
@@ -201,10 +284,13 @@ class Concrete5_Helper_Mail {
 		$str = '';
 		for ($i = 0; $i < count($arr); $i++) {
 			$v = $arr[$i];
-			if (isset($v[1])) {
-				$str .= '"' . $v[1] . '" <' . $v[0] . '>';
+			$nm = $v->getName();
+			$em = $v->getAddress();
+
+			if ($nm != '') {
+				$str .= '"' . $nm . '" <' . $em . '>';
 			} else {
-				$str .= $v[0];
+				$str .= $em;
 			}
 			if (($i + 1) < count($arr)) {
 				$str .= ', ';
@@ -212,163 +298,53 @@ class Concrete5_Helper_Mail {
 		}
 		return $str;
 	}
-	
-	/** 
-	 * Sets the from address on the email about to be sent out
-	 * @param string $email
-	 * @param string $name
-	 * @return void
-	 */
-	public function from($email, $name = null) {
-		$this->from = array($email, $name);
-	}
-	
-	/** 
-	 * Sets to the to email address on the email about to be sent out.
-	 * @param string $email
-	 * @param string $name
-	 * @return void
-	 */
-	public function to($email, $name = null) {
-		if (strpos($email, ',') > 0) {
-			$email = explode(',', $email);
-			foreach($email as $em) {
-				$this->to[] = array($em, $name);
-			}
-		} else {
-			$this->to[] = array($email, $name);	
-		}
-	}
-	
-	/**
-	 * Adds an email address to the cc field on the email about to be sent out.
-	 * @param string $email
-	 * @param string $name
-	 * @return void
-	 * @since 5.5.1
-	*/
-	public function cc($email, $name = null) {
-		if (strpos($email, ',') > 0) {
-			$email = explode(',', $email);
-			foreach($email as $em) {
-				$this->cc[] = array($em, $name);
-			}
-		} else {
-			$this->cc[] = array($email, $name);	
-		}
-	}
-	
-	/**
-	 * Adds an email address to the bcc field on the email about to be sent out.
-	 * @param string $email
-	 * @param string $name
-	 * @return void
-	 * @since 5.5.1
-	*/
-	public function bcc($email, $name = null) {
-		if (strpos($email, ',') > 0) {
-			$email = explode(',', $email);
-			foreach($email as $em) {
-				$this->bcc[] = array($em, $name);
-			}
-		} else {
-			$this->bcc[] = array($email, $name);	
-		}
-	}
 
-	/*	
-	 * Sets the reply-to address on the email about to be sent out
-	 * @param string $email
-	 * @param string $name
-	 * @return void
-	 */
-	public function replyto($email, $name = null) {
-		if (strpos($email, ',') > 0) {
-			$email = explode(',', $email);
-			foreach($email as $em) {
-				$this->replyto[] = array($em, $name);
-			}
-		} else {
-			$this->replyto[] = array($email, $name);	
-		}
-	}
-	/** Set the testing state (if true the email logging never occurs and sending errors will throw an exception)
-	* @param bool $testing
-	*/
-	public function setTesting($testing) {
-		$this->testing = $testing ? true : false;
-	}
-	/** Retrieve the testing state
-	* @return boolean
-	*/
-	public function getTesting() {
-		return $this->testing;
-	}
 	/** 
 	 * Sends the email
 	 * @return void
 	 */
 	public function sendMail($resetData = true) {
-		$_from[] = $this->from;
-		$fromStr = $this->generateEmailStrings($_from);
-		$toStr = $this->generateEmailStrings($this->to);
-		$replyStr = $this->generateEmailStrings($this->replyto);
-		if (ENABLE_EMAILS) {
-			
-			$zendMailData = self::getMailerObject();
-			$mail=$zendMailData['mail'];
-			$transport=(isset($zendMailData['transport']))?$zendMailData['transport']:NULL;
-			
-			if (is_array($this->from) && count($this->from)) {
-				if ($this->from[0] != '') {
-					$from = $this->from;
-				}
-			}
-			if (!isset($from)) {
-				$from = array(EMAIL_DEFAULT_FROM_ADDRESS, EMAIL_DEFAULT_FROM_NAME);
-				$fromStr = EMAIL_DEFAULT_FROM_ADDRESS;
-			}
-			
-			// The currently included Zend library has a bug in setReplyTo that
-			// adds the Reply-To address as a recipient of the email. We must
-			// set the Reply-To before any header with addresses and then clear
-			// all recipients so that a copy is not sent to the Reply-To address.
-			if(is_array($this->replyto)) {
-				foreach ($this->replyto as $reply) {
-					$mail->setReplyTo($reply[0], $reply[1]);
-				}
-			}
-			$mail->clearRecipients();
-			
+		
+		$this->data = array();
+		$this->template = ''; 
+		$this->testing = false;
 
-			$mail->setFrom($from[0], $from[1]);
-			$mail->setSubject($this->subject);
-			foreach($this->to as $to) {
-				$mail->addTo($to[0], $to[1]);
-			}
-			
-			if(is_array($this->cc) && count($this->cc)) {
-				foreach($this->cc as $cc) {
-					$mail->addCc($cc[0], $cc[1]);
-				}
-			}
-			
-			if(is_array($this->bcc) && count($this->bcc)) {
-				foreach($this->bcc as $bcc) {
-					$mail->addBcc($bcc[0], $bcc[1]);
-				}
-			}
-			
-			$mail->setBodyText($this->body);
+
+		if (ENABLE_EMAILS) {
+			//Create a new email object and supply it with information
+			$mail=new Email();
+			if(count($this->from) == 0) $this->from[] = new Address(EMAIL_DEFAULT_FROM_ADDRESS);
+			$mail->from(...$this->from);
+			$mail->to(...$this->to);
+			if(count($this->cc) > 0) $mail->cc(...$this->cc);
+			if(count($this->bcc) > 0) $mail->bcc(...$this->bcc);
+			if(count($this->replyto) > 0) $mail->replyTo(...$this->replyto);
+			$mail->subject($this->subject);
+			$mail->text($this->body);
 			if ($this->bodyHTML != false) {
-				$mail->setBodyHTML($this->bodyHTML);
+				$mail->html($this->bodyHTML);
 			}
-			$mail->clearMessageId();
-			$mail->setMessageId();
+			$mail->getHeaders();
+			if(count($this->headers) > 0){
+				foreach($this->headers as $h){
+					$mail->addTextHeader($h[0],$h[1]);
+				}
+			}
+
+			//Create an email transport
+			$transport=self::getMailerObject();
+
+			if(ENABLE_LOG_EMAILS){
+				$toStr = $this->generateEmailStrings($this->to);
+				$fromStr = $this->generateEmailStrings($this->from);
+				$replyStr = $this->generateEmailStrings($this->replyto);
+			}
+			
 			try {
-				$mail->send($transport);
-					
-			} catch(Exception $e) {
+
+				$transport->send($mail);
+
+			} catch(TransportExceptionInterface $e) {
 				if($this->getTesting()) {
 					throw $e;
 				}

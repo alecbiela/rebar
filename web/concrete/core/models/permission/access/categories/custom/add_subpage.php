@@ -27,7 +27,7 @@ class Concrete5_Model_AddSubpagePagePermissionAccess extends PagePermissionAcces
 	}
 
 	public function save($args) {
-		parent::save($args);
+		parent::save();
 		$db = Loader::db();
 		$db->Execute('delete from PagePermissionPageTypeAccessList where paID = ?', array($this->getPermissionAccessID()));
 		$db->Execute('delete from PagePermissionPageTypeAccessListCustom where paID = ?', array($this->getPermissionAccessID()));
