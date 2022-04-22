@@ -1,5 +1,7 @@
 <?php defined('C5_EXECUTE') or die('Access Denied.');
 
+use JamesHeinrich\GetID3\GetID3;
+
 class Concrete5_Library_AudioFileTypeInspector extends FileTypeInspector {
 
 	/**
@@ -9,8 +11,7 @@ class Concrete5_Library_AudioFileTypeInspector extends FileTypeInspector {
 	public function inspect($fv) {
 		$result = false;
 		try {
-			Loader::library('3rdparty/getid3/getid3');
-			$gi3 = new getID3();
+			$gi3 = new GetID3();
 			$info = $gi3->analyze($fv->getPath());
 			if(is_array($info) && empty($info['error'])) {
 				if(
