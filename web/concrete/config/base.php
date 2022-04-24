@@ -366,6 +366,10 @@ if (!defined('DIR_FILES_PAGE_CACHE')) {
 	define('DIR_FILES_PAGE_CACHE', DIR_BASE . '/files/cache/pages');
 }
 
+if (!defined('DIR_FILES_TRANSLATION_CACHE')) {
+	define('DIR_FILES_TRANSLATION_CACHE', DIR_BASE . '/files/cache/translations');
+}
+
 if (!defined('PAGE_CACHE_LIBRARY')) {
 	define('PAGE_CACHE_LIBRARY', 'file');
 }

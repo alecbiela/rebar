@@ -1,5 +1,7 @@
 <?php defined('C5_EXECUTE') or die('Access Denied.');
 
+use Symfony\Component\Intl\Locales;
+
 /**
  * Functions useful functions for working with dates.
  * @package Helpers

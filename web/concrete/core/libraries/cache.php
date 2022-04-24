@@ -202,6 +202,12 @@ class Concrete5_Library_Cache {
 			apc_clear_cache();
 		}        
 
+		//flush the translations cache
+		if (is_dir(DIR_FILES_TRANSLATION_CACHE)) {
+			$fh = Loader::helper("file");
+			$fh->removeAll(DIR_FILES_TRANSLATION_CACHE);
+		}
+
 		Events::fire('on_cache_flush', $cache);
 		return true;
 	}

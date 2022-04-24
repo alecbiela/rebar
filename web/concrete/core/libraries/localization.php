@@ -1,5 +1,10 @@
 <?php
 	defined('C5_EXECUTE') or die("Access Denied.");
+
+	use Symfony\Component\Intl\Locales;
+	use Symfony\Component\Translation\Translator;
+	use Symfony\Component\Translation\Loader\MoFileLoader;
+
 	class Concrete5_Library_Localization {
 
 		private static $loc = null;
@@ -43,19 +48,15 @@
 			return current(explode('_', self::activeLocale()));
 		}
 
-		/** The current Zend_Translate instance (null if and only if locale is en_US)
-		* @var Zend_Translate|null
+		/** The current Translator instance (null if and only if locale is en_US)
+		* @var Symfony\Component\Translation\Translator|null
 		*/
 		protected $translate;
 
 		public function __construct() {
 			Loader::library('3rdparty/Zend/Date');
-			Loader::library('3rdparty/Zend/Translate');
-			Loader::library('3rdparty/Zend/Locale');
-			Loader::library('3rdparty/Zend/Locale/Data');
 			$cache = Cache::getLibrary();
 			if (is_object($cache)) {
-				Zend_Translate::setCache($cache);
 				Zend_Date::setOptions(array('cache'=>$cache));
 			}
 			$locale = defined('ACTIVE_LOCALE') ? ACTIVE_LOCALE : 'en_US';
@@ -88,11 +89,9 @@
 			}
 			
 			$options = array(
-				'adapter' => 'gettext',
-				'content' => $languageDir,
-				'locale'  => $locale,
-				'disableNotices'  => true,
-				'ignore' => array('.', 'messages.po')
+				'adapter' => 'mo',
+				'content' => $languageDir.'/LC_MESSAGES/messages.mo',
+				'locale'  => $locale
 			);
 			if (defined('TRANSLATE_OPTIONS')) {
 				$_options = unserialize(TRANSLATE_OPTIONS);
@@ -101,16 +100,17 @@
 				}
 			}
 
-			if (!isset($this->translate)) {
-				$this->translate = new Zend_Translate($options);
+			if (is_null($this->translate)) {
+				$this->translate = new Translator($options['locale'],null,DIR_FILES_TRANSLATION_CACHE);
+				$this->translate->addLoader($options['adapter'], new MoFileLoader());
 				$localeNeededLoading = true;
 			} else {
-				if (!in_array($locale, $this->translate->getList())) {
-					$this->translate->addTranslation($options);
-					$localeNeededLoading = true;
-				}
-				$this->translate->setLocale($locale);
+				if (!in_array($options['locale'], $this->translate->getCatalogues())) $localeNeededLoading = true;
+				$this->translate->setLocale($options['locale']);
 			}
+			$this->translate->addResource($options['adapter'], $options['content'], $options['locale']);
+			$this->translate->getCatalogue($options['locale']); //forces load of message bank if it's not loaded already
+
 			if(!$coreOnly) {
 				$this->addSiteInterfaceLanguage($locale);
 				global $config_check_failed;
@@ -125,6 +125,9 @@
 							$pkg->setupPackageLocalization($locale, null, $this->translate);
 						}
 					}
+					//reload the catalogue to pick up any new translations added by packages
+					$localeNeededLoading = true;
+					$this->translate->getCatalogue($locale);
 				}
 			}
 			if($localeNeededLoading) {
@@ -136,8 +139,8 @@
 			return isset($this->translate) ? $this->translate->getLocale() : 'en_US';
 		}
 
-		/** Returns the current Zend_Translate instance (null if and only if locale is en_US)
-		* @var Zend_Translate|null
+		/** Returns the current Translator instance (null if and only if locale is en_US)
+		* @var Symfony\Component\Translation\Translator|null
 		*/
 		public function getActiveTranslateObject() {
 			return $this->translate;
@@ -158,8 +161,8 @@
 			}
 		}
 
-		/** Returns the current Zend_Translate instance (null if and only if locale is en_US)
-		* @var Zend_Translate|null
+		/** Returns the current Translator instance (null if and only if locale is en_US)
+		* @var Symfony\Component\Translation\Translator|null
 		*/
 		public static function getTranslate() {
 			$loc = Localization::getInstance();
@@ -221,39 +224,12 @@
 		 * @return string Description of a language
 		 */
 		public static function getLanguageDescription($locale, $displayLocale = null) {
-			$localeList = Zend_Locale::getLocaleList();
-			if (! isset($localeList[$locale])) {
-				return $locale;
-			}
+			//check to make sure the locales exist
+			if (!Locales::exists($locale)) return $locale;
+			if (!is_null($displayLocale) && !Locales::exists($displayLocale)) $displayLocale = null;
+			$displayLocale = $displayLocale?:$locale;
 
-			if ($displayLocale !== NULL && (! isset($localeList[$displayLocale]))) {
-				$displayLocale = NULL;
-			}
-
-			$cacheLibrary = Cache::getLibrary();
-			if (is_object($cacheLibrary)) {
-				Zend_Locale_Data::setCache($cacheLibrary);
-			}
-
-			$displayLocale = $displayLocale?$displayLocale:$locale;
-
-			$zendLocale = new Zend_Locale($locale);
-			$languageName = Zend_Locale::getTranslation($zendLocale->getLanguage(), 'language', $displayLocale);
-			$description = $languageName;
-			$region = $zendLocale->getRegion();
-			if($region !== false) {
-				$regionName = Zend_Locale::getTranslation($region, 'country', $displayLocale);
-				if($regionName !== false) {
-					$localeData = Zend_Locale_Data::getList($displayLocale, 'layout');
-					if ( $localeData['characters'] == "right-to-left") {
-						$description = '(' . $languageName . ' (' . $regionName ;
-					} else {
-						$description = $languageName . ' (' . $regionName . ")";
-					}
-
-				}
-			}
-			return $description;
+			return Locales::getName($locale, $displayLocale);
 		}
 
 	}

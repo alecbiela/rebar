@@ -9,10 +9,10 @@ defined('C5_EXECUTE') or die("Access Denied.");
 * @example t('Hello %s', 'John') will return translation for 'Hello %s' (example: 'Ciao %s'), using 'John' for printf (so the final result will be 'Ciao John' for Italian).
 */
 function t($text) {
-	$zt = Localization::getTranslate();
+	$translator = Localization::getTranslate();
 	if (func_num_args() == 1) {
-		if (is_object($zt)) {
-			return $zt->_($text);
+		if (is_object($translator)) {
+			return $translator->trans($text);
 		} else {
 			return $text;
 		}
@@ -21,8 +21,8 @@ function t($text) {
 	for($i = 1 ; $i < func_num_args(); $i++) {
 		$arg[] = func_get_arg($i);
 	}
-	if (is_object($zt)) {
-		return vsprintf($zt->_($text), $arg);
+	if (is_object($translator)) {
+		return vsprintf($translator->trans($text), $arg);
 	} else {
 		return vsprintf($text, $arg);
 	}
@@ -38,9 +38,9 @@ function t($text) {
 * @example t2('%d child', '%d children', $n, $n) will return translated '1 child' if $n is 1, translated '2 children' if $n is 2.
 */
 function t2($singular, $plural, $number) {
-	$zt = Localization::getTranslate();
-	if(is_object($zt)) {
-		$translated = $zt->plural($singular, $plural, $number);
+	$translator = Localization::getTranslate();
+	if(is_object($translator)) {
+		$translated = $translator->plural($singular, $plural, $number);
 	} else {
 		$translated = $number == 1 ? $singular : $plural;
 	}
@@ -62,10 +62,10 @@ function t2($singular, $plural, $number) {
 * @example tc('End date', 'To %s', '01/01/2000') will return translation for 'To %s' (example: 'Fino al %s'), using '01/01/2000' for printf (so the final result will be 'Fino al 01/01/2000' for Italian).
 */
 function tc($context, $text) {
-	$zt = Localization::getTranslate();
-	if (is_object($zt)) {
+	$translator = Localization::getTranslate();
+	if (is_object($translator)) {
 		$msgid = $context . "\x04" . $text;
-		$msgtxt = $zt->_($msgid);
+		$msgtxt = $translator->trans($msgid);
 		if($msgtxt != $msgid) {
 			$text = $msgtxt;
 		}
