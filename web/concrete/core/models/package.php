@@ -230,7 +230,7 @@ class Concrete5_Model_Package extends ConcreteObject {
 	
 	}
 	
-	/** Loads package translation files into zend translate
+	/** Loads package translation files into symfony translate
 	* @param string $folder = null The directory name containing the locale file to load (for example: 'en_US'). If empty we'll use the locale identifier of $translate
 	* @param string $locale = null The identifier of the locale to activate (for example: 'en_US'). If empty we'll use $folder
 	* @param string|Symfony\Component\Translation\Translator $translate = 'current' The Translator instance that holds the translations (set to 'current' to use the current one)

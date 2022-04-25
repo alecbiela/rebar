@@ -54,14 +54,8 @@
 		protected $translate;
 
 		public function __construct() {
-			Loader::library('3rdparty/Zend/Date');
-			$cache = Cache::getLibrary();
-			if (is_object($cache)) {
-				Zend_Date::setOptions(array('cache'=>$cache));
-			}
 			$locale = defined('ACTIVE_LOCALE') ? ACTIVE_LOCALE : 'en_US';
 			$this->setLocale($locale);
-			Zend_Date::setOptions(array('format_type' => 'php'));
 		}
 
 		/** Changes the currently active locale

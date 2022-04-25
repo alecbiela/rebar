@@ -11,6 +11,16 @@ use Symfony\Component\Intl\Locales;
  * @license http://www.concrete5.org/documentation/background/license/ MIT License
  */
 class Concrete5_Helper_Date {
+
+	/**
+	 * Asserts that the PHP extension for international datetimes is loaded
+	 */
+	public function __construct() {
+        if (!extension_loaded('intl')) {
+            throw new Exception('The intl PHP extension is required to use the date/time helper.');
+        }
+	}
+
 	/**
 	 * Gets the date time for the local time zone/area if user timezones are enabled, if not returns system datetime
 	 * @param string $systemDateTime
@@ -97,35 +107,27 @@ class Concrete5_Helper_Date {
 	 * @return string
 	 */
 	public function dateTimeFormatLocal(&$datetime,$mask) {
-		$locale = new Zend_Locale(Localization::activeLocale());
-
-		$date = new Zend_Date($datetime->format(DATE_ATOM), DATE_ATOM, $locale);
-		$date->setTimeZone($datetime->format('e'));
-		return $date->toString($mask);
+		$locale = Localization::activeLocale();
+		$isomask = $this->convertPhpToIsoFormat($mask);
+		$formatter = new IntlDateFormatter($locale, IntlDateFormatter::FULL, IntlDateFormatter::FULL, $datetime->format('e'), IntlDateFormatter::GREGORIAN, $isomask);
+		return $formatter->format($datetime);
 	}
 	/**
 	 * Subsitute for the native date() function that adds localized date support
-	 * This uses Zend's Date Object {@link http://framework.zend.com/manual/en/zend.date.constants.html#zend.date.constants.phpformats}
 	 * @param string $mask
 	 * @param int $timestamp
 	 * @return string
 	 */
-	public function date($mask,$timestamp=false) {
-		$loc = Localization::getInstance();
-		if ($timestamp === false) {
-			$timestamp = time();
-		}
-		if ($loc->getLocale() == 'en_US') {
-			return date($mask, $timestamp);
-		}
-		$locale = new Zend_Locale(Localization::activeLocale());
-		Zend_Date::setOptions(array('format_type' => 'php'));
-		$cache = Cache::getLibrary();
-		if (is_object($cache)) {
-			Zend_Date::setOptions(array('cache'=>$cache));
-		}
-		$date = new Zend_Date($timestamp, false, $locale);
-		return $date->toString($mask);
+	public function date($mask,$timestamp=false,$timezone='user') {
+		$locale = Localization::activeLocale();
+		if ($timestamp === false) $timestamp = time();
+		if ($locale == 'en_US') return date($mask, $timestamp);
+
+		$isomask = $this->convertPhpToIsoFormat($mask);
+		$formatter = new IntlDateFormatter($locale, IntlDateFormatter::FULL, IntlDateFormatter::FULL, $this->getTimezone($timezone), IntlDateFormatter::GREGORIAN, $isomask);
+		$date = new \DateTime();
+		$date->setTimestamp($timestamp);
+		return $formatter->format($date);
 	}
 	/**
 	 * Returns a keyed array of timezone identifiers
@@ -187,11 +189,10 @@ class Concrete5_Helper_Date {
 		return $description;
 	}
 	/**
-	 * Convert a date to a Zend_Date instance.
-	 * @param string|DateTime|Zend_Date|int $value It can be:<ul>
+	 * Convert a date to a DateTime instance.
+	 * @param string|DateTime|int $value It can be:<ul>
 	 *	<li>the special value 'now' (default) to return the current date/time</li>
 	 *	<li>a DateTime instance</li>
-	 *	<li>a Zend_Date instance</li>
 	 *	<li>a string parsable by strtotime (the current system timezone is used)</li>
 	 *	<li>a timestamp</li>
 	 * </ul>
@@ -201,35 +202,36 @@ class Concrete5_Helper_Date {
 	 *	<li>'app' for the app's timezone</li>
 	 *	<li>Other values: one of the PHP supported time zones (see http://us1.php.net/manual/en/timezones.php )</li>
 	 * </ul>
-	 * @return Zend_Date|null Returns the Zend_Date instance (or null if $value couldn't be parsed)
+	 * @return DateTime|null Returns the DateTime instance (or null if $value couldn't be parsed)
 	 */
-	public function toZendDate($value = 'now', $timezone = 'system') {
-		$zendDate = null;
-		if (is_int($value)) {
-			$zendDate = new Zend_Date($value, Zend_Date::TIMESTAMP);
-		} elseif ($value instanceof DateTime) {
-			$zendDate = new Zend_Date($value->format(DATE_ATOM), DATE_ATOM);
-			$zendDate->setTimeZone($value->format('e'));
-		} elseif (is_a($value, 'Zend_Date')) {
-			$zendDate = clone $value;
-		} elseif (is_string($value) && strlen($value)) {
+	public function toIntlDate($value = 'now', $timezone = 'system') {
+		$intlDate = null;
+		if($value instanceof \DateTime){
+			$intlDate = $value;
+		}elseif (is_int($value)) {
+			$intlDate = new \DateTime();
+			$intlDate->setTimestamp($value);
+		}elseif (is_string($value) && strlen($value)) {
 			if ($value === 'now') {
-				$zendDate = new Zend_Date();
+				$intlDate = new \DateTime();
 			} elseif (is_numeric($value)) {
-				$zendDate = new Zend_Date($value, Zend_Date::TIMESTAMP);
+				$intlDate = new \DateTime();
+				$intlDate->setTimestamp($value);
 			} else {
 				$timestamp = @strtotime($value);
 				if ($timestamp !== false) {
-					$zendDate = new Zend_Date($timestamp, Zend_Date::TIMESTAMP);
+					$intlDate = new \DateTime();
+					$intlDate->setTimestamp($timestamp);
 				}
 			}
 		}
-		if (is_null($zendDate)) {
+
+		if (is_null($intlDate)) {
 			return null;
 		}
-		$zendDate->setLocale(Localization::activeLocale());
-		$zendDate->setTimezone($this->getTimezone($timezone));
-		return $zendDate;
+		//Locale used to be handled here, but will probably be handled in the formatting functions now
+		$intlDate->setTimezone($this->getTimezone($timezone));
+		return $intlDate;
 	}
 	/** Returns the current timezone.
 	* @param string $for Which timezone to get. It may be:<ul>
@@ -238,7 +240,7 @@ class Concrete5_Helper_Date {
 	 *	<li>'app' for the app's timezone</li>
 	 *	<li>Other values: they'll be returned as is</li>
 	 * </ul>
-	* @return string
+	* @return DateTimeZone
 	 */
 	public function getTimezone($for) {
 		switch($for) {
@@ -270,12 +272,12 @@ class Concrete5_Helper_Date {
 				$tz = $for;
 				break;
 		}
-		return $tz;
+		return new \DateTimeZone($tz);
 	}
 	/**
-	 * Returns the difference in days between to dates.
-	 * @param mixed $from The start date/time representation (one of the values accepted by toZendDate)
-	 * @param mixed $to The end date/time representation (one of the values accepted by toZendDate)
+	 * Returns the difference in days between two dates.
+	 * @param mixed $from The start date/time representation (one of the values accepted by toIntlDate)
+	 * @param mixed $to The end date/time representation (one of the values accepted by toIntlDate)
 	 * @param string $timezone The timezone to set. Special values are:<ul>
 	 *	<li>'system' for the current system timezone</li>
 	 *	<li>'user' (default) for the user's timezone</li>
@@ -285,24 +287,21 @@ class Concrete5_Helper_Date {
 	 * @return int|null Returns the difference in days (less than zero if $dateFrom if greater than $dateTo).
 	 * Returns null if one of both the dates can't be parsed.
 	 */
-	public function getDeltaDays($from, $to, $timezone = 'user') {
-		$zendFrom = $this->toZendDate($from, $timezone);
-		$zendTo = $this->toZendDate($to, $timezone);
-		if(is_null($zendFrom) || is_null($zendTo)) {
+	public function getDeltaDays($f, $t, $timezone = 'user') {
+		$from = $this->toIntlDate($f, $timezone);
+		$to = $this->toIntlDate($t, $timezone);
+		if(is_null($from) || is_null($to)) {
 			return null;
 		}
-		$zendFromUTC = new Zend_Date();
-		$zendToUTC = new Zend_Date();
-		$zendFromUTC->setTimezone('GMT');
-		$zendToUTC->setTimezone('GMT');
-		$zendFromUTC->setDate($zendFrom->toString('Y-m-d'), 'Y-m-d');
-		$zendToUTC->setDate($zendTo->toString('Y-m-d'), 'Y-m-d');
-		$zendToUTC->sub($zendFromUTC);
-		return round($zendToUTC->getTimestamp() / 86400);
+		$from = $from->setTimezone($this->getTimezone('GMT'));
+		$to = $to->setTimezone($this->getTimezone('GMT'));
+		$diff = $to->diff($from);
+
+		return $diff->days;
 	}
 	/**
 	 * Render the date part of a date/time as a localized string
-	 * @param mixed $value The date/time representation (one of the values accepted by toZendDate)
+	 * @param mixed $value The date/time representation (one of the values accepted by toIntlDate)
 	 * @param bool $longDate Set to true for the long date format (eg 'December 31, 2000'), false (default) for the short format (eg '12/31/2000')
 	 * @param string $timezone The timezone to set. Special values are:<ul>
 	 *	<li>'system' for the current system timezone</li>
@@ -313,28 +312,18 @@ class Concrete5_Helper_Date {
 	 * @return string Returns an empty string if $value couldn't be parsed, the localized string otherwise
 	 */
 	public function formatDate($value = 'now', $longDate = false, $timezone = 'user') {
-		$zendDate = $this->toZendDate($value, $timezone);
-		if (is_null($zendDate)) {
-			return '';
-		}
-		if($longDate) {
-			$format = defined('CUSTOM_DATE_APP_GENERIC_MDY_FULL') ?
-				CUSTOM_DATE_APP_GENERIC_MDY_FULL
-				:
-				t(/*i18n: Long date format: see http://www.php.net/manual/en/function.date.php */ 'F j, Y')
-			;
-		} else {
-			$format = defined('CUSTOM_DATE_APP_GENERIC_MDY') ?
-				CUSTOM_DATE_APP_GENERIC_MDY
-				:
-				t(/*i18n: Short date format: see http://www.php.net/manual/en/function.date.php */ 'n/j/Y')
-			;
-		}
-		return $zendDate->toString($format);
+		$locale = Localization::activeLocale();
+		$date = $this->toIntlDate($value, $timezone);
+		if(is_null($date)) return '';
+
+		if($longDate) $formatter = new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::NONE, $this->getTimezone($timezone), IntlDateFormatter::GREGORIAN);
+		else $formatter = new IntlDateFormatter($locale, IntlDateFormatter::SHORT, IntlDateFormatter::NONE, $this->getTimezone($timezone), IntlDateFormatter::GREGORIAN);
+		
+		return $formatter->format($date);
 	}
 	/**
 	 * Render the time part of a date/time as a localized string
-	 * @param mixed $value The date/time representation (one of the values accepted by toZendDate)
+	 * @param mixed $value The date/time representation (one of the values accepted by toIntlDate)
 	 * @param bool $withSeconds Set to true to include seconds (eg '11:59:59 PM'), false (default) otherwise (eg '11:59 PM');
 	 * @param string $timezone The timezone to set. Special values are:<ul>
 	 *	<li>'system' for the current system timezone</li>
@@ -345,29 +334,18 @@ class Concrete5_Helper_Date {
 	 * @return string Returns an empty string if $value couldn't be parsed, the localized string otherwise
 	 */
 	public function formatTime($value = 'now', $withSeconds = false, $timezone = 'user') {
-		$zendDate = $this->toZendDate($value, $timezone);
-		if (is_null($zendDate)) {
-			return '';
-		}
-		if($withSeconds) {
-			$format = defined('CUSTOM_DATE_APP_GENERIC_TS') ?
-				CUSTOM_DATE_APP_GENERIC_TS
-				:
-				t(/*i18n: Time format with seconds: see http://www.php.net/manual/en/function.date.php */ 'g:i:s A')
-			;
-		} else {
-			$format =
-				defined('CUSTOM_DATE_APP_GENERIC_T') ?
-				CUSTOM_DATE_APP_GENERIC_T
-				:
-				t(/*i18n: Time format without seconds: see http://www.php.net/manual/en/function.date.php */ 'g:i A')
-			;
-		}
-		return $zendDate->toString($format);
+		$locale = Localization::activeLocale();
+		$date = $this->toIntlDate($value, $timezone);
+		if(is_null($date)) return '';
+
+		if($withSeconds) $formatter = new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::LONG, $this->getTimezone($timezone), IntlDateFormatter::GREGORIAN);
+		else $formatter = new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, $this->getTimezone($timezone), IntlDateFormatter::GREGORIAN);
+		
+		return $formatter->format($date);
 	}
 	/**
 	 * Render both the date and time parts of a date/time as a localized string
-	 * @param mixed $value The date/time representation (one of the values accepted by toZendDate)
+	 * @param mixed $value The date/time representation (one of the values accepted by toIntlDate)
 	 * @param bool $longDate Set to true for the long date format (eg 'December 31, 2000 at ...'), false (default) for the short format (eg '12/31/2000 at ...')
 	 * @param bool $withSeconds Set to true to include seconds (eg '... at 11:59:59 PM'), false (default) otherwise (eg '... at 11:59 PM');
 	 * @param string $timezone The timezone to set. Special values are:<ul>
@@ -379,41 +357,37 @@ class Concrete5_Helper_Date {
 	 * @return string Returns an empty string if $value couldn't be parsed, the localized string otherwise
 	*/
 	public function formatDateTime($value = 'now', $longDate = false, $withSeconds = false, $timezone = 'user') {
-		$zendDate = $this->toZendDate($value, $timezone);
-		if (is_null($zendDate)) {
-			return '';
+		$locale = Localization::activeLocale();
+		$date = $this->toIntlDate($value, $timezone);
+		if(is_null($date)) return '';
+
+		switch(true){
+			case ($longDate && $withSeconds):	//long date, long time
+				$mask = $this->convertPhpToIsoFormat('F d, Y \a\t g:i:s A');
+				$formatter = new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::LONG, $this->getTimezone($timezone), IntlDateFormatter::GREGORIAN, $mask);
+				break;
+			case ($longDate && !$withSeconds):	//long date, short time
+				$mask = $this->convertPhpToIsoFormat('F d, Y \a\t g:i A');
+				$formatter = new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::SHORT, $this->getTimezone($timezone), IntlDateFormatter::GREGORIAN, $mask);
+				break;
+			case (!$longDate && $withSeconds):	//short date, long time
+				$mask = $this->convertPhpToIsoFormat('n/j/Y \a\t g:i:s A');
+				$formatter = new IntlDateFormatter($locale, IntlDateFormatter::SHORT, IntlDateFormatter::LONG, $this->getTimezone($timezone), IntlDateFormatter::GREGORIAN, $mask);
+				break;
+			case (!$longDate && !$withSeconds):	//short date, short time
+				$mask = $this->convertPhpToIsoFormat('n/j/Y \a\t g:i A');
+				$formatter = new IntlDateFormatter($locale, IntlDateFormatter::SHORT, IntlDateFormatter::SHORT, $this->getTimezone($timezone), IntlDateFormatter::GREGORIAN, $mask);
+				break;
+			default: 							//catch-all
+				$formatter = new IntlDateFormatter($locale, IntlDateFormatter::FULL, IntlDateFormatter::FULL, $this->getTimezone($timezone), IntlDateFormatter::GREGORIAN);
+				break;
 		}
-		if ($longDate) {
-			if($withSeconds) {
-				$format = defined('CUSTOM_DATE_APP_GENERIC_MDYT_FULL_SECONDS') ?
-					CUSTOM_DATE_APP_GENERIC_MDYT_FULL_SECONDS
-					:
-					t(/*i18n: Long date format and time with seconds: see http://www.php.net/manual/en/function.date.php */ 'F d, Y \\a\\t g:i:s A')
-				;
-			} else {
-				$format = defined('CUSTOM_DATE_APP_GENERIC_MDYT_FULL') ?
-					CUSTOM_DATE_APP_GENERIC_MDYT_FULL
-					:
-					t(/*i18n: Long date format and time without seconds: see http://www.php.net/manual/en/function.date.php */ 'F d, Y \\a\\t g:i A')
-				;
-			}
-		} else {
-			if($withSeconds) {
-				$format = t(/*i18n: Short date format and time with seconds: see http://www.php.net/manual/en/function.date.php */ 'n/j/Y \\a\\t g:i:s A');
-			}
-			else {
-				$format = defined('CUSTOM_DATE_APP_GENERIC_MDYT') ?
-					CUSTOM_DATE_APP_GENERIC_MDYT
-					:
-					t(/*i18n: Short date format and time without seconds: see http://www.php.net/manual/en/function.date.php */ 'n/j/Y \\a\\t g:i A')
-				;
-			}
-		}
-		return $zendDate->toString($format);
+
+		return $formatter->format($date);
 	}
 	/**
 	 * Render the date part of a date/time as a localized string. If the day is yesterday we'll print 'Yesterday' (the same for today, tomorrow)
-	 * @param mixed $value The date/time representation (one of the values accepted by toZendDate)
+	 * @param mixed $value The date/time representation (one of the values accepted by toIntlDate)
 	 * @param bool $longDate Set to true for the long date format (eg 'December 31, 2000'), false (default) for the short format (eg '12/31/2000')
 	 * @param string $timezone The timezone to set. Special values are:<ul>
 	 *	<li>'system' for the current system timezone</li>
@@ -424,11 +398,11 @@ class Concrete5_Helper_Date {
 	 * @return string Returns an empty string if $value couldn't be parsed, the localized string otherwise
 	 */
 	public function formatPrettyDate($value, $longDate = false, $timezone = 'user') {
-		$zendDate = $this->toZendDate($value, $timezone);
-		if (is_null($zendDate)) {
+		$date = $this->toIntlDate($value, $timezone);
+		if (is_null($date)) {
 			return '';
 		}
-		$days = $this->getDeltaDays('now', $zendDate, $timezone);
+		$days = $this->getDeltaDays('now', $date, $timezone);
 		switch($days) {
 			case 0:
 				return t('Today');
@@ -437,12 +411,12 @@ class Concrete5_Helper_Date {
 			case -1:
 				return t('Yesterday');
 			default:
-				return $this->formatDate($zendDate, $longDate);
+				return $this->formatDate($date, $longDate);
 		}
 	}
 	/**
 	 * Render both the date and time parts of a date/time as a localized string. If the day is yesterday we'll print 'Yesterday' (the same for today, tomorrow)
-	 * @param mixed $value The date/time representation (one of the values accepted by toZendDate)
+	 * @param mixed $value The date/time representation (one of the values accepted by toIntlDate)
 	 * @param bool $longDate Set to true for the long date format (eg 'December 31, 2000 at ...'), false (default) for the short format (eg '12/31/2000 at ...')
 	 * @param bool $withSeconds Set to true to include seconds (eg '... at 11:59:59 PM'), false (default) otherwise (eg '... at 11:59 PM');
 	 * @param string $timezone The timezone to set. Special values are:<ul>
@@ -454,26 +428,24 @@ class Concrete5_Helper_Date {
 	 * @return string Returns an empty string if $value couldn't be parsed, the localized string otherwise
 	 */
 	public function formatPrettyDateTime($value, $longDate = false, $withSeconds = false, $timezone = 'user') {
-		$zendDate = $this->toZendDate($value, $timezone);
-		if (is_null($zendDate)) {
-			return '';
-		}
-		$days = $this->getDeltaDays('now', $zendDate, $timezone);
+		$date = $this->toIntlDate($value, $timezone);
+		if (is_null($date)) return '';
+		$days = $this->getDeltaDays('now', $date, $timezone);
 		switch($days) {
 			case 0:
-				return t(/*i18n: %s is a time */ 'Today at %s', $this->formatTime($zendDate, $withSeconds, $timezone));
+				return t(/*i18n: %s is a time */ 'Today at %s', $this->formatTime($date, $withSeconds, $timezone));
 			case 1:
-				return t(/*i18n: %s is a time */ 'Tomorrow at %s', $this->formatTime($zendDate, $withSeconds, $timezone));
+				return t(/*i18n: %s is a time */ 'Tomorrow at %s', $this->formatTime($date, $withSeconds, $timezone));
 			case -1:
-				return t(/*i18n: %s is a time */ 'Yesterday at %s', $this->formatTime($zendDate, $withSeconds, $timezone));
+				return t(/*i18n: %s is a time */ 'Yesterday at %s', $this->formatTime($date, $withSeconds, $timezone));
 			default:
-				return $this->formatDateTime($zendDate, $longDate, $withSeconds);
+				return $this->formatDateTime($date, $longDate, $withSeconds);
 		}
 	}
 	/**
 	 * Render a date/time as a localized string, by specifying a custom format
 	 * @param string $format The custom format (see http://www.php.net/manual/en/function.date.php for applicable formats)
-	 * @param mixed $value The date/time representation (one of the values accepted by toZendDate)
+	 * @param mixed $value The date/time representation (one of the values accepted by toIntlDate)
 	 * @param string $timezone The timezone to set. Special values are:<ul>
 	 *	<li>'system' for the current system timezone</li>
 	 *	<li>'user' (default) for the user's timezone</li>
@@ -483,16 +455,14 @@ class Concrete5_Helper_Date {
 	 * @return string Returns an empty string if $value couldn't be parsed, the localized string otherwise
 	 */
 	public function formatCustom($format, $value = 'now', $timezone = 'user') {
-		$zendDate = $this->toZendDate($value, $timezone);
-		if (is_null($zendDate)) {
-			return '';
-		}
-		return $zendDate->toString($format);
+		$date = $this->toIntlDate($value, $timezone);
+		if (is_null($date)) return '';
+		return $this->date($format, $date->getTimestamp(), $timezone);
 	}
 	/**
 	 * Render a date/time as a localized string, by specifying the name of one of the format accepted by getSpecialFormat
 	 * @param string $formatName The name of the custom format (@see getSpecialFormat)
-	 * @param mixed $value The date/time representation (one of the values accepted by toZendDate)
+	 * @param mixed $value The date/time representation (one of the values accepted by toIntlDate)
 	 * @param string $timezone The timezone to set. Special values are:<ul>
 	 *	<li>'system' for the current system timezone</li>
 	 *	<li>'user' (default) for the user's timezone</li>
@@ -524,40 +494,20 @@ class Concrete5_Helper_Date {
 	public function getSpecialFormat($formatName) {
 		switch($formatName) {
 			case 'FILENAME':
-				return defined("CUSTOM_DATE_APP_$formatName") ?
-					constant("CUSTOM_DATE_APP_$formatName")
-					:
-					t(/*i18n: Used when dates are used to start filenames: see http://www.php.net/manual/en/function.date.php */ 'd-m-Y_H:i_')
-				;
+				return 'd-m-Y_H:i_';
 			case 'FILE_PROPERTIES':
 			case 'FILE_VERSIONS':
 			case 'FILE_DOWNLOAD':
-				return defined("CUSTOM_DATE_APP_$formatName") ?
-					constant("CUSTOM_DATE_APP_$formatName")
-					:
-					t(/*i18n: Long date format and time without seconds: see http://www.php.net/manual/en/function.date.php */ 'F d, Y \\a\\t g:i A')
-				;
+				return 'F d, Y \a\t g:i A';
 			case 'PAGE_VERSIONS':
 			case 'DASHBOARD_SEARCH_RESULTS_USERS':
 			case 'DASHBOARD_SEARCH_RESULTS_FILES':
 			case 'DASHBOARD_SEARCH_RESULTS_PAGES':
-				return defined("CUSTOM_DATE_APP_$formatName") ?
-					constant("CUSTOM_DATE_APP_$formatName")
-					:
-					t(/*i18n: Short date format and time without seconds: see http://www.php.net/manual/en/function.date.php */ 'n/j/Y \\a\\t g:i A')
-				;
+				return 'n/j/Y \a\t g:i A';
 			case 'DATE_ATTRIBUTE_TYPE_MDY':
-				return defined("CUSTOM_DATE_APP_$formatName") ?
-					constant("CUSTOM_DATE_APP_$formatName")
-					:
-					t(/*i18n: Short date format: see http://www.php.net/manual/en/function.date.php */ 'n/j/Y')
-				;
+				return 'n/j/Y';
 			case 'DATE_ATTRIBUTE_TYPE_T':
-				return defined("CUSTOM_DATE_APP_$formatName") ?
-					constant("CUSTOM_DATE_APP_$formatName")
-					:
-					t(/*i18n: Time format with seconds: see http://www.php.net/manual/en/function.date.php */ 'g:i:s A')
-				;
+				return 'g:i:s A';
 		}
 		return '';
 	}
@@ -623,4 +573,61 @@ class Concrete5_Helper_Date {
 		}
 		return $datepickerFormat;
 	}
+
+
+	/**
+     * Converts a format string from PHP's date format to ISO format
+     * Originally part of Zend Framework 1.12: https://framework.zend.com/license
+     * https://framework.zend.com/apidoc/1.12/classes/Zend_Locale_Format.html#method_convertPhpToIsoFormat
+	 * 
+     * @param  string  $format  Format string in PHP's date format
+     * @return string           Format string in ISO format
+     */
+    private function convertPhpToIsoFormat($format)
+    {
+        if ($format === null) {
+            return null;
+        }
+
+        $convert = array('d' => 'dd'  , 'D' => 'EE'  , 'j' => 'd'   , 'l' => 'EEEE', 'N' => 'eee' , 'S' => 'SS'  ,
+                         'w' => 'e'   , 'z' => 'D'   , 'W' => 'ww'  , 'F' => 'MMMM', 'm' => 'MM'  , 'M' => 'MMM' ,
+                         'n' => 'M'   , 't' => 'ddd' , 'L' => 'l'   , 'o' => 'YYYY', 'Y' => 'yyyy', 'y' => 'yy'  ,
+                         'a' => 'a'   , 'A' => 'a'   , 'B' => 'B'   , 'g' => 'h'   , 'G' => 'H'   , 'h' => 'hh'  ,
+                         'H' => 'HH'  , 'i' => 'mm'  , 's' => 'ss'  , 'e' => 'zzzz', 'I' => 'I'   , 'O' => 'Z'   ,
+                         'P' => 'ZZZZ', 'T' => 'z'   , 'Z' => 'X'   , 'c' => 'yyyy-MM-ddTHH:mm:ssZZZZ',
+                         'r' => 'r'   , 'U' => 'U');
+        $values = str_split($format);
+        $escaped = false;
+        $lastescaped = false;
+        $temp = array();
+        foreach ($values as $key => $value) {
+            if (!$escaped && $value == '\\') {
+                $escaped = true;
+                continue;
+            }
+            if ($escaped) {
+            	if (!$lastescaped) {
+            		$temp[] = "'";
+            		$lastescaped = true;
+            	} 
+            	$temp[] = $value;
+            	$escaped = false;
+            } else { 
+            	if ($value == "'") {
+	                $temp[] = "''";
+	            } else {
+		            if ($lastescaped) {
+	            		$temp[] = "'";
+	            		$lastescaped = false;
+	            	    }
+		            if (isset($convert[$value]) === true) {
+		                $temp[] = $convert[$value];
+		            } else {
+		                $temp[] = $value;
+		            }
+	            }
+            }
+        }
+        return join($temp);
+    }
 }

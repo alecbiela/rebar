@@ -40,7 +40,6 @@ class Concrete5_Helper_Form_DateTime {
 			if (strlen(trim($value)) === 0) {
 				return '';
 			}
-			$format = defined('CUSTOM_DATE_APP_GENERIC_MDY') ? CUSTOM_DATE_APP_GENERIC_MDY : t(/*i18n: Short date format: see http://www.php.net/manual/en/function.date.php */ 'n/j/Y');
 			$h = is_numeric($arr[$field . '_h']) ? $arr[$field . '_h'] : '00';
 			$m = is_numeric($arr[$field . '_m']) ? $arr[$field . '_m'] : '00';
 			if(isset($arr[$field . '_a'])) {
@@ -50,27 +49,23 @@ class Concrete5_Helper_Form_DateTime {
 					$a = $dateHelper->date('A', mktime(13));
 				}
 				$value .= " $h:$m $a";
-				$format .= ' h:i A';
 			}
 			else {
 				$value .= " $h:$m";
-				$format .= ' H:i';
 			}
-			$d = new Zend_Date();
-			$d->setTimezone($dateHelper->getTimezone('user'));
-			$d->set($value, $format, Localization::activeLocale());
-			return $dateHelper->formatCustom('Y-m-d H:i:s', $d, 'system');
-		}
-		elseif (isset($arr[$field])) {
+			$date = $dateHelper->toIntlDate($value, 'user');
+			if(is_null($date)) $date = $dateHelper->toIntlDate('now', 'user');
+
+			return $dateHelper->formatCustom('Y-m-d H:i:s', $date, 'system');
+		}elseif (isset($arr[$field])) {
 			$value = $arr[$field];
 			if (strlen(trim($value)) === 0) {
 				return '';
 			}
-			$format = defined('CUSTOM_DATE_APP_GENERIC_MDY') ? CUSTOM_DATE_APP_GENERIC_MDY : t(/*i18n: Short date format: see http://www.php.net/manual/en/function.date.php */ 'n/j/Y');
-			$d = new Zend_Date();
-			$d->setTimezone($dateHelper->getTimezone('system'));
-			$d->set($value, $format, Localization::activeLocale());
-			return $dateHelper->formatCustom('Y-m-d', $d, 'system');
+			$date = $dateHelper->toIntlDate($value, 'user');
+			if(is_null($date)) $date = $dateHelper->toIntlDate('now', 'user');
+	
+			return $dateHelper->formatCustom('Y-m-d', $date, 'system');
 		}
 		else {
 			return false;
@@ -107,14 +102,14 @@ class Concrete5_Helper_Form_DateTime {
 		$dfhe = (DATE_FORM_HELPER_FORMAT_HOUR == '12') ? '12' : '23';
 		$dfhs = (DATE_FORM_HELPER_FORMAT_HOUR == '12') ? '1' : '0';
 		$dateHelper = Loader::helper('date'); /* @var $dateHelper DateHelper */
-		$zendDate = $dateHelper->toZendDate($value);
-		if(is_null($zendDate)) {
-			$zendDate = $dateHelper->toZendDate('now');
+		$date = $dateHelper->toIntlDate($value);
+		if(is_null($date)) {
+			$date = $dateHelper->toIntlDate('now');
 		}
-		$dt = $dateHelper->formatDate($zendDate, false, 'user');
-		$h = $dateHelper->formatCustom($dfh, $zendDate, 'user');
-		$m = $dateHelper->formatCustom('i', $zendDate, 'user');
-		$a = $dateHelper->formatCustom('A', $zendDate, 'user');
+		$dt = $dateHelper->formatDate($date, false, 'user');
+		$h = $dateHelper->formatCustom($dfh, $date, 'user');
+		$m = $dateHelper->formatCustom('i', $date, 'user');
+		$a = $dateHelper->formatCustom('A', $date, 'user');
 		$id = preg_replace("/[^0-9A-Za-z-]/", "_", $prefix);
 		$html = '';
 		$disabled = false;
