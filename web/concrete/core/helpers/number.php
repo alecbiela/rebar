@@ -17,24 +17,14 @@ class Concrete5_Helper_Number {
 		return round($value, $p);
 	}
 
-	/** Returns the Zend_Locale instance for the current locale.
-	* @return Zend_Locale
-	*/
-	protected function getZendLocale() {
-		static $zl;
-		$locale = Localization::activeLocale();
-		if((!isset($zl)) || ($locale != $zl->toString())) {
-			$zl = new Zend_Locale($locale);
-		}
-		return $zl;
-	}
-
 	/** Checks if a given string is valid representation of a number in the current locale.
 	* @return bool
 	* @example http://www.concrete5.org/documentation/how-tos/developers/formatting-numbers/ See the Formatting numbers how-to for more details
 	*/
 	public function isNumber($string) {
-		return Zend_Locale_Format::isNumber($string, array('locale' => $this->getZendLocale()));
+		$nf = new \NumberFormatter(Localization::activeLocale(), \NumberFormatter::DECIMAL);
+		$test = $nf->parse($string);
+		return is_numeric($test);
 	}
 
 	/** Checks if a given string is valid representation of an integer in the current locale.
@@ -42,7 +32,9 @@ class Concrete5_Helper_Number {
 	* @example http://www.concrete5.org/documentation/how-tos/developers/formatting-numbers/ See the Formatting numbers how-to for more details
 	*/
 	public function isInteger($string) {
-		return Zend_Locale_Format::isInteger($string, array('locale' => $this->getZendLocale()));
+		$nf = new \NumberFormatter(Localization::activeLocale(), \NumberFormatter::DECIMAL);
+		$test = $nf->parse($string);
+		return is_int($test);
 	}
 
 	/** Format a number with grouped thousands and localized decimal point/thousands separator.
@@ -52,14 +44,11 @@ class Concrete5_Helper_Number {
 	* @example http://www.concrete5.org/documentation/how-tos/developers/formatting-numbers/ See the Formatting numbers how-to for more details
 	*/
 	public function format($number, $precision = null) {
-		if(!is_numeric($number)) {
-			return $number;
-		}
-		$options = array('locale' => $this->getZendLocale());
-		if(is_numeric($precision)) {
-			$options['precision'] = $precision;
-		}
-		return Zend_Locale_Format::toNumber($number, $options);
+		$nf = new \NumberFormatter(Localization::activeLocale(), \NumberFormatter::DECIMAL);
+		if(!is_numeric($number)) return $number;
+
+		if(is_int($precision)) $nf->setAttribute(\NumberFormatter::MAX_FRACTION_DIGITS, $precision);
+		return $nf->format($number);
 	}
 
 
@@ -83,11 +72,10 @@ class Concrete5_Helper_Number {
 		if(!(strlen($string) && $this->isNumber($string))) {
 			return null;
 		}
-		$options = array('locale' => $this->getZendLocale());
-		if(is_numeric($precision)) {
-			$options['precision'] = $precision;
-		}
-		return Zend_Locale_Format::getNumber($string, $options);
+
+		$nf = new \NumberFormatter(Localization::activeLocale(), \NumberFormatter::DECIMAL);
+		if(is_int($precision)) $nf->setAttribute(\NumberFormatter::MAX_FRACTION_DIGITS, $precision);
+		return $nf->format($string);
 	}
 
 	/** Formats a size (measured in bytes, KB, MB, ...).
