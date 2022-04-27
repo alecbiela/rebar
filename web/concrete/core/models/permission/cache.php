@@ -13,10 +13,10 @@ class Concrete5_Model_PermissionCache {
 			return false;
 		}
 		$cl = CacheLocal::get();
-		if ($cl->enabled) {
+		if ($cl->getEnabled()) {
 			$identifier = 'pr:' . get_class($object) . ':' . $object->getPermissionObjectIdentifier();
-			if (array_key_exists($identifier, $cl->cache)) {
-				return $cl->cache[$identifier];
+			if (!is_null($cl->getValue($identifier))) {
+				return $cl->getValue($identifier);
 			}
 		}
 	}
@@ -26,9 +26,9 @@ class Concrete5_Model_PermissionCache {
 			return false;
 		}
 		$cl = CacheLocal::get();
-		if ($cl->enabled) {
+		if ($cl->getEnabled()) {
 			$identifier = 'pr:' . get_class($object) . ':' . $object->getPermissionObjectIdentifier();
-			$cl->cache[$identifier] = $pr;
+			$cl->setValue($identifier, $pr);
 		}
 	}
 
@@ -37,10 +37,10 @@ class Concrete5_Model_PermissionCache {
 			return false;
 		}
 		$cl = CacheLocal::get();
-		if ($cl->enabled) {
+		if ($cl->getEnabled()) {
 			$identifier = 'pao:' . $pk->getPermissionKeyID() . ':' . $paID;
-			if (array_key_exists($identifier, $cl->cache)) {
-				return $cl->cache[$identifier];
+			if (!is_null($cl->getValue($identifier))) {
+				return $cl->getValue($identifier);
 			}
 		}
 	}
@@ -50,9 +50,9 @@ class Concrete5_Model_PermissionCache {
 			return false;
 		}
 		$cl = CacheLocal::get();
-		if ($cl->enabled) {
+		if ($cl->getEnabled()) {
 			$identifier = 'pao:' . $pk->getPermissionKeyID() . ':' . $paID;
-			$cl->cache[$identifier] = $obj;
+			$cl->setValue($identifier, $obj);
 		}
 	}
 	
@@ -61,7 +61,7 @@ class Concrete5_Model_PermissionCache {
 			return -1;
 		}
 		$cl = CacheLocal::get();
-		if (!$cl->enabled) {
+		if (!$cl->getEnabled()) {
 			return -1;
 		}
 		
@@ -72,8 +72,8 @@ class Concrete5_Model_PermissionCache {
 			$identifier = 'pk:' . $pk->getPermissionKeyHandle();
 		}
 
-		if (array_key_exists($identifier, $cl->cache)) {
-			return $cl->cache[$identifier];
+		if (!is_null($cl->getValue($identifier))) {
+			return $cl->getValue($identifier);
 		}
 
 		return -1;
@@ -84,14 +84,14 @@ class Concrete5_Model_PermissionCache {
 			return false;
 		}
 		$cl = CacheLocal::get();
-		if ($cl->enabled) {
+		if ($cl->getEnabled()) {
 			$object = $pk->getPermissionObject();
 			if (is_object($object)) {
 				$identifier = 'pk:' . $pk->getPermissionKeyHandle() . ':' . $object->getPermissionObjectIdentifier();
 			} else {
 				$identifier = 'pk:' . $pk->getPermissionKeyHandle();
 			}
-			$cl->cache[$identifier] = $valid;
+			$cl->setValue($identifier, $valid);
 		}
 	}
 	
@@ -100,9 +100,9 @@ class Concrete5_Model_PermissionCache {
 			return false;
 		}
 		$cl = CacheLocal::get();
-		if ($cl->enabled) {
+		if ($cl->getEnabled()) {
 			$identifier = 'pka:' . $pk->getPermissionKeyHandle() . ':' . $object->getPermissionObjectIdentifier();
-			$cl->cache[$identifier] = $pa;
+			$cl->setValue($identifier, $pa);
 		}
 	}
 
@@ -111,9 +111,9 @@ class Concrete5_Model_PermissionCache {
 			return false;
 		}
 		$cl = CacheLocal::get();
-		if ($cl->enabled) {
+		if ($cl->getEnabled()) {
 			$identifier = 'pka:' . $pk->getPermissionKeyHandle() . ':' . $object->getPermissionObjectIdentifier();
-			unset($cl->cache[$identifier]);
+			$cl->deleteValue($identifier);
 		}
 	}
 
@@ -122,10 +122,10 @@ class Concrete5_Model_PermissionCache {
 			return false;
 		}
 		$cl = CacheLocal::get();
-		if ($cl->enabled) {
+		if ($cl->getEnabled()) {
 			$identifier = 'pka:' . $pk->getPermissionKeyHandle() . ':' . $object->getPermissionObjectIdentifier();
-			if (array_key_exists($identifier, $cl->cache)) {
-				return $cl->cache[$identifier];
+			if (!is_null($cl->getValue($identifier))) {
+				return $cl->getValue($identifier);
 			}
 		}
 		return false;

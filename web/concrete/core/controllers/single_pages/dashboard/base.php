@@ -18,6 +18,7 @@ class Concrete5_Controller_Dashboard_Base extends Controller {
 		$this->token = Loader::helper('validation/token');
 		$this->error = Loader::helper('validation/error');
 		$this->set('interface', Loader::helper('concrete/interface'));
+		$this->set('test', true);
 	}
 	
 	public function on_before_render() {

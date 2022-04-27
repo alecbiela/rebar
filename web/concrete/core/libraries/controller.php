@@ -372,7 +372,7 @@ class Concrete5_Library_Controller {
 	*/
 	public function set($key, $val) {
 		$loc = CacheLocal::get();
-		$loc->cache['controllerSets'][$key] = $val;
+		$loc->setValue($key, $val, 'controllerSets');
 		$this->sets[$key] = $val;
 	}
 	
@@ -518,8 +518,8 @@ class Concrete5_Library_Controller {
 	 */
 	public function getSets() { 
 		$loc = CacheLocal::get();
-		if (isset($loc->cache['controllerSets'])) {
-			return $loc->cache['controllerSets'];
+		if (isset($loc->getEntries()['controllerSets'])) {
+			return $loc->getEntries()['controllerSets'];
 		}
 		return array();
 	}
