@@ -124,7 +124,7 @@ class Concrete5_Library_Cache {
 		}
 
 		if(!is_null($ad)){
-			$this->$adapter = $ad;
+			$this->adapter = $ad;
 			//set the master cache key, for flushing purposes
 			$this->adapter->get('MASTER_CACHE_KEY', function(ItemInterface $item){
 				$item->expiresAfter(null);

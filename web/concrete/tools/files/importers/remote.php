@@ -1,5 +1,9 @@
 <?php defined('C5_EXECUTE') or die("Access Denied.");
 
+use Symfony\Component\Validator\Constraints\UrlValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
+use Symfony\Component\HttpClient\HttpClient;
+
 $u = new User();
 
 $cf = Loader::helper('file');
@@ -23,12 +27,10 @@ $searchInstance = $_POST['searchInstance'];
 
 $valt = Loader::helper('validation/token');
 Loader::library("file/importer");
-Loader::library('3rdparty/Zend/Http/Client');
-Loader::library('3rdparty/Zend/Uri/Http');
 $file = Loader::helper('file');
 Loader::helper('mime');
 
-$error = array();
+$errors = array();
 
 // load all the incoming fields into an array
 $incoming_urls = array();
@@ -41,12 +43,31 @@ if (count($errors) == 0) {
 	for ($i = 1; $i < 6; $i++) {
 		$this_url = trim($_REQUEST['url_upload_' .$i]);
 
-		// did we get anything?
-		if (!strlen($this_url))
-			continue;
-
 		// validate URL
-		if (Zend_Uri_Http::check($this_url)) {
+		$url_is_valid = true;
+		$pattern = UrlValidator::PATTERN;
+
+		//Computationally the same as UrlValidator->validate without the custom violation building
+        if (null === $this_url || '' === $this_url) {
+            continue;	//likely no value was input into this field.
+        }
+
+        if (!is_scalar($this_url) && !(\is_object($this_url) && method_exists($this_url, '__toString'))) {
+            $url_is_valid = false;
+        }
+
+        $this_url = (string) $this_url;
+        if ('' === $this_url) {
+            $url_is_valid = false;
+        }
+
+        $pattern = sprintf($pattern, implode('|', ['http', 'https']));
+
+        if (!preg_match($pattern, $this_url)) {
+			$url_is_valid = false;
+        }
+
+		if ($url_is_valid) {
 			// URL appears to be good... add it
 			$incoming_urls[] = $this_url;
 		} else {
@@ -73,23 +94,23 @@ if (count($errors) < 1) {
 	// itterate over each incoming URL adding if relevant
 	foreach($incoming_urls as $this_url) {
 		// try to D/L the provided file
-		$client = new Zend_Http_Client($this_url);
-		$response = $client->request();
+		$client = HttpClient::create();
+		$response = $client->request('GET', $this_url);
 
-		if ($response->isSuccessful()) {
-			$uri = Zend_Uri_Http::fromString($this_url);
+		if ($response->getStatusCode() < 400) { //should rule out all errors
+			$urlpath = parse_url($this_url)["path"];
 			$fname = '';
 			$fpath = $file->getTemporaryDirectory();
 
 			// figure out a filename based on filename, mimetype, ???
-			if (preg_match('/^.+?[\\/]([-\w%]+\.[-\w%]+)$/', $uri->getPath(), $matches)) {
+			if (preg_match('/^.+?[\\/]([-\w%]+\.[-\w%]+)$/', $urlpath, $matches)) {
 				// got a filename (with extension)... use it
 				$fname = $matches[1];
-			} else if (! is_null($response->getHeader('Content-Type'))) {
+			} else if (! is_null($response->getHeaders()['content-type'][0])) {
 				// use mimetype from http response
-				$fextension = MimeHelper::mimeToExtension($response->getHeader('Content-Type'));
+				$fextension = MimeHelper::mimeToExtension($response->getHeaders()['content-type'][0]);
 				if ($fextension === false)
-					$errors[] = t('Unknown mime-type: ') . $response->getHeader('Content-Type');
+					$errors[] = t('Unknown mime-type: ') . $response->getHeaders()['content-type'][0];
 				else {
 					$dh = Loader::helper('date');
 					/* @var $dh DateHelper */
@@ -106,7 +127,7 @@ if (count($errors) < 1) {
 			if (strlen($fname)) {
 				// write the downloaded file to a temporary location on disk
 				$handle = fopen($fpath.'/'.$fname, "w");
-				fwrite($handle, $response->getBody());
+				fwrite($handle, $response->getContent());
 				fclose($handle);
 
 				// import the file into concrete

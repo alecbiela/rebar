@@ -494,11 +494,11 @@ class Concrete5_Helper_Date {
 	public function getSpecialFormat($formatName) {
 		switch($formatName) {
 			case 'FILENAME':
-				return 'd-m-Y_H:i_';
+				return 'd-m-Y_H_i_';
 			case 'FILE_PROPERTIES':
 			case 'FILE_VERSIONS':
 			case 'FILE_DOWNLOAD':
-				return 'F d, Y \a\t g:i A';
+				return 'F d, Y \a\t g_i A';
 			case 'PAGE_VERSIONS':
 			case 'DASHBOARD_SEARCH_RESULTS_USERS':
 			case 'DASHBOARD_SEARCH_RESULTS_FILES':

@@ -746,6 +746,15 @@
                 0 => '2.3',
             ),
         ),
+        'symfony/validator' => array(
+            'pretty_version' => '5.4.x-dev',
+            'version' => '5.4.9999999.9999999-dev',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/validator',
+            'aliases' => array(),
+            'reference' => 'bdc6d04ba95c73ccbf906b4ad9b8775c738d83ad',
+            'dev_requirement' => false,
+        ),
         'symfony/var-dumper' => array(
             'pretty_version' => '5.4.x-dev',
             'version' => '5.4.9999999.9999999-dev',

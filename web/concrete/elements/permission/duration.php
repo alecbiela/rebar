@@ -21,9 +21,17 @@ for ($i = 1; $i <= 12; $i++) {
 	$repeatMonths[$i] = $i;
 }
 
-
-Loader::library('3rdparty/Zend/Locale');
-$list = Zend_Locale::getTranslationList('Days', ACTIVE_LOCALE);
+//Get the days of the week in the current locale
+$formatter = new \IntlDateFormatter(Localization::activeLocale(), IntlDateFormatter::FULL, IntlDateFormatter::NONE, null, null, "cccc");
+$daysofweek = array(
+	$formatter->format(strtotime('Monday')),
+	$formatter->format(strtotime('Tuesday')),
+	$formatter->format(strtotime('Wednesday')),
+	$formatter->format(strtotime('Thursday')),
+	$formatter->format(strtotime('Friday')),
+	$formatter->format(strtotime('Saturday')),
+	$formatter->format(strtotime('Sunday'))
+);
 
 
 $pdStartDate = false;
@@ -151,7 +159,7 @@ $dt = Loader::helper('form/date_time');
 <div class="controls">
 <?php 
 $x = 0;
-foreach($list['format']['wide'] as $key => $value) { ?>
+foreach($daysofweek as $key => $value) { ?>
 	<label><input <?php if (in_array($x, $pdRepeatPeriodWeekDays)) { ?>checked="checked" <?php } ?>
 	type="checkbox" name="pdRepeatPeriodWeeksDays[]" value="<?php echo $x?>" /> <span><?php echo $value?></span></label>
 	
