@@ -20,6 +20,24 @@ class Concrete5_Library_Model extends ADOdb_Active_Record {
 	}
 
     /**
+     * Makes this class have case-insensitive variable setting
+     * Since ADODB sets column names in all-uppercase
+     * But the C5 core sets them in camel-case
+     * Since ADODB populates column names on instantiation, we will default to those
+     */
+    // public function __set($name, $value){
+    //     //get list of available obj vars
+    //     $oVars = get_object_vars($this);
+    //     foreach($oVars as $variable=>$val){
+    //         if(strcasecmp($name, $variable) == 0){
+    //             $this->{$variable} = $value;
+    //         } else {
+    //             $this->{strtoupper($name)} = $value;
+    //         }
+    //     }
+    // }
+
+    /**
      * Override the default `doquote` method to better sanitize numeric values.
      *
      * @param ADOConnection $db

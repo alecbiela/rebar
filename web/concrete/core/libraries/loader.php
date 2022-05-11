@@ -250,11 +250,17 @@
 		 * these need to be loaded before the models which need to be loaded before db() 
 		 */
 		public function database() {
-			require(DIR_BASE_CORE . '/libraries/3rdparty/adodb/adodb.inc.php');
-			require(DIR_BASE_CORE . '/libraries/3rdparty/adodb/adodb-exceptions.inc.php');
-			require(DIR_BASE_CORE . '/libraries/3rdparty/adodb/adodb-active-record.inc.php');
-			require(DIR_BASE_CORE . '/libraries/3rdparty/adodb/adodb-xmlschema03.inc.php');
+			global $ADODB_NEWCONNECTION;
+			$ADODB_NEWCONNECTION = 'c5_db_driver';
+			function& c5_db_driver($driver){
+				return new DatabaseConnection();
+			}
+			require(DIR_BASE_CORE . '/libraries/3rdparty/Rebar/vendor/adodb/adodb-php/adodb.inc.php');
+			require(DIR_BASE_CORE . '/libraries/3rdparty/Rebar/vendor/adodb/adodb-php/adodb-exceptions.inc.php');
+			require(DIR_BASE_CORE . '/libraries/3rdparty/Rebar/vendor/adodb/adodb-php/adodb-active-record.inc.php');
+			require(DIR_BASE_CORE . '/libraries/3rdparty/Rebar/vendor/adodb/adodb-php/adodb-xmlschema03.inc.php');
 			require(DIR_BASE_CORE . '/libraries/database.php');
+			require(DIR_BASE_CORE . '/libraries/database_connection.php');
 		}
 		
 		/** 
@@ -276,6 +282,7 @@
 				}
 
 				if (isset($dsn) && $dsn) {
+
 					$_dba = @NewADOConnection($dsn);
 					if (is_object($_dba)) {
 						$_dba->setFetchMode(ADODB_FETCH_ASSOC);

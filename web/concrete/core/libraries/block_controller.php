@@ -161,19 +161,21 @@ defined('C5_EXECUTE') or die("Access Denied.");
 			//$argsMerged = array_merge($_POST, $args);
 			if ($this->btTable) {
 				$db = Loader::db();
-				$columns = $db->GetCol('show columns from `' . $this->btTable . '`'); // I have no idea why getAttributeNames isn't working anymore.
 				$this->record = new BlockRecord($this->btTable);
 				$this->record->bID = $this->bID;
+				$columns = $this->record->getAttributeNames();
+
 				foreach($columns as $key) {
 					if (isset($args[$key])) {
 						$this->record->{$key} = $args[$key];
 					}
 				}
+
 				$this->record->Replace();
 				if ($this->cacheBlockRecord() && ENABLE_BLOCK_CACHE) {
 					$record = serialize($this->record);
 					$db = Loader::db();
-					$db->Execute('update Blocks set btCachedBlockRecord = ? where bID = ?', array($record, $this->bID));
+					$db->Execute('update Blocks set btCachedBlockRecord = ? where bID = ?', array($record, $this->record->bID));
 				}
 			}
 		}

@@ -6,9 +6,6 @@
         "symfony/skeleton": "^5.4",
         "symfony/mailer": "5.4.x-dev",
         "symfony/http-client": "5.4.x-dev",
-        "doctrine/doctrine-bundle": "2.7.x-dev",
-        "doctrine/doctrine-migrations-bundle": "3.3.x-dev",
-        "doctrine/orm": "2.13.x-dev",
         "symfony/proxy-manager-bridge": "5.4.x-dev",
         "symfony/translation": "5.4.x-dev",
         "james-heinrich/getid3": "2.0.x-dev",
@@ -16,7 +13,8 @@
         "symfony/security-bundle": "5.4.x-dev",
         "symfony/intl": "5.4.x-dev",
         "symfony/validator": "5.4.x-dev",
-        "doctrine/annotations": "1.14.x-dev"
+        "adodb/adodb-php": "5.22",
+        "symfony/cache": "5.4.x-dev"
     },
     "license": "MIT",
     "authors": [
