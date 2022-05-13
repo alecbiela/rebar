@@ -22,7 +22,7 @@ if ($_POST['process']) {
 	$messages = $q->receive(COPY_PAGES_LIMIT);
 	foreach($messages as $key => $p) {
 		// delete the page here
-		$page = unserialize($p->body);
+		$page = unserialize($p->getBody());
 		$oc = Page::getByID($page['cID']);
 		// this is the page we're going to copy.
 		// now we check to see if the parent ID of the current record has already been duplicated somewhere.

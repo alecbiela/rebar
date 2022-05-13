@@ -14,7 +14,7 @@ if ($_POST['process']) {
 	$messages = $q->receive(DELETE_PAGES_LIMIT);
 	foreach($messages as $key => $p) {
 		// delete the page here
-		$page = unserialize($p->body);
+		$page = unserialize($p->getBody());
 		$c = Page::getByID($page['cID']);
 		$c->delete();
 		$q->deleteMessage($p);

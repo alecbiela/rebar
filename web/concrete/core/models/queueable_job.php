@@ -28,9 +28,9 @@ abstract class Concrete5_Model_QueueableJob extends Job {
 	// optional queue functions
 	protected $jQueueBatchSize = JOB_QUEUE_BATCH_SIZE;
 	public function getJobQueueBatchSize() {return $this->jQueueBatchSize;}
-	abstract public function start(Zend_Queue $q);
-	abstract public function finish(Zend_Queue $q);
-	abstract public function processQueueItem(Zend_Queue_Message $msg);
+	abstract public function start(Queue $q);
+	abstract public function finish(Queue $q);
+	abstract public function processQueueItem(QueueMessage $msg);
 	public function run() {}
 
 	public function getQueueObject() {

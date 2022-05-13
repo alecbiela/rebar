@@ -18,7 +18,7 @@ if ($_POST['task'] == 'delete_pages') {
 		$messages = $q->receive(DELETE_PAGES_LIMIT);
 		foreach($messages as $key => $p) {
 			// delete the page here
-			$page = unserialize($p->body);
+			$page = unserialize($p->getBody());
 			$c = Page::getByID($page['cID']);
 			if ($c->getCollectionID() > 1) {
 				$pkr = new DeletePagePageWorkflowRequest();

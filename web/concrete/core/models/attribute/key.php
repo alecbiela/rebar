@@ -476,8 +476,8 @@ class Concrete5_Model_AttributeKey extends ConcreteObject {
 		
 		$db = Loader::db();
 		$columns = $db->MetaColumns($this->getIndexedSearchTable());
-		$dba = NewDataDictionary($db, DB_TYPE);
-		
+		$dba = NewDataDictionary($db, DB_DATADICT_TYPE);
+
 		foreach($fields as $col => $field) {
 
 			$addColumn = true;
@@ -498,7 +498,7 @@ class Concrete5_Model_AttributeKey extends ConcreteObject {
 			}
 			
 			if ($prevColumn != false) {
-				if ($columns[strtoupper($prevColumn)]) {
+				if ($columns[$prevColumn]) {
 					$q = $dba->RenameColumnSQL($this->getIndexedSearchTable(), $prevColumn, $column, $field);
 					$db->Execute($q[0]);
 					$addColumn = false;
@@ -506,7 +506,7 @@ class Concrete5_Model_AttributeKey extends ConcreteObject {
 			}
 			
 			if ($addColumn) {
-				if (!$columns[strtoupper($column)]) {
+				if (!$columns[$column]) {
 					$q = $dba->AddColumnSQL($this->getIndexedSearchTable(), $field);
 					$db->Execute($q[0]);
 				}
@@ -527,7 +527,7 @@ class Concrete5_Model_AttributeKey extends ConcreteObject {
 
 		if ($this->getIndexedSearchTable()) {
 			$columns = $db->MetaColumns($this->getIndexedSearchTable());
-			$dba = NewDataDictionary($db, DB_TYPE);
+			$dba = NewDataDictionary($db, DB_DATADICT_TYPE);
 			
 			$fields = array();
 			if (!is_array($cnt->getSearchIndexFieldDefinition())) {
@@ -634,7 +634,7 @@ class Concrete5_Model_AttributeKey extends ConcreteObject {
 	public function createIndexedSearchTable() {
 		if ($this->getIndexedSearchTable() != false) {
 			$db = Loader::db();
-			$dba = NewDataDictionary($db, DB_TYPE);
+			$dba = NewDataDictionary($db, DB_DATADICT_TYPE);
 			$sqa = $dba->CreateTableSQL($this->getIndexedSearchTable(), $this->searchIndexFieldDefinition);
 			$dba->ExecuteSQLArray($sqa);
 		}

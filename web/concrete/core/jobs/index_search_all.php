@@ -19,7 +19,7 @@ class Concrete5_Job_IndexSearchAll extends QueueableJob {
 		return t("Empties the page search index and reindexes all pages.");
 	}
 
-	public function start(Zend_Queue $q) {
+	public function start(Queue $q) {
 		Loader::library('database_indexed_search');
 		$this->is = new IndexedSearch();
 
@@ -41,14 +41,14 @@ class Concrete5_Job_IndexSearchAll extends QueueableJob {
 		}
 	}
 	
-	public function finish(Zend_Queue $q) {
+	public function finish(Queue $q) {
 		$db = Loader::db();
 		$total = $db->GetOne('select count(*) from PageSearchIndex');
 		return t('Index updated. %s pages indexed.', $total);
 	}
 
-	public function processQueueItem(Zend_Queue_Message $msg) {
-		$c = Page::getByID($msg->body, 'ACTIVE');
+	public function processQueueItem(QueueMessage $msg) {
+		$c = Page::getByID($msg->getBody(), 'ACTIVE');
 		$cv = $c->getVersionObject();
 		if (is_object($cv)) {
 			$c->reindex($this->is, true);

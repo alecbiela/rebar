@@ -33,6 +33,7 @@ $classes = array(
 	'AttributeTypeController' => array('library','attribute/controller'),
 	'Marketplace' => array('library', 'marketplace'),
 	'Queue' => array('library','queue'),
+	'QueueMessage' => array('library', 'queue_message'),
 	'Area' => array('model','area'),
 	'GlobalArea' => array('model','global_area'),
 	'AttributeKey' => array('model','attribute/key'),
@@ -225,8 +226,7 @@ $classes = array(
 	'SecurimageSystemCaptchaTypeController' => array('model','system/captcha/types/securimage/controller'),
 	'DashboardBaseController' => array('controller', '/dashboard/base'),
 	'AccountController' => array('controller', '/account'),
-	'AccountProfileEditController' => array('controller', '/account/profile/edit'),
-	'Zend_Queue_Adapter_Concrete5' => array('library', 'Zend/Queue/Adapter/Concrete5')
+	'AccountProfileEditController' => array('controller', '/account/profile/edit')
 );
 
 Loader::registerAutoload($classes);

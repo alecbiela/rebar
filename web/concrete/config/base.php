@@ -509,6 +509,10 @@ if (!defined('DB_TYPE')) {
 		define('DB_TYPE', 'mysqlt');
 	}
 }
+# mysqli datadict type removed in ADODB 5.2, have to define plain mySQL
+if (!defined('DB_DATADICT_TYPE')) {
+	define('DB_DATADICT_TYPE', 'mysql');
+}
 if (!defined('DB_USE_CACHE')) {
 	// caching now handled by our app, no longer by adodb
 	define('DB_USE_CACHE', false);
