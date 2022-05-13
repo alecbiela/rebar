@@ -78,7 +78,7 @@ class Concrete5_Library_Update {
 	}
 	
 	public function getApplicationUpdateInformation() {
-		$r = Cache::get('APP_UPDATE_INFO', false);
+		$r = Cache::getLibrary()->get('APP_UPDATE_INFO', false);
 		if (!is_object($r)) {
 			$r = Update::getLatestAvailableUpdate();
 		}
@@ -124,7 +124,7 @@ class Concrete5_Library_Update {
 				$obj->date = (string) $xml->date;
 			}		
 
-			Cache::set('APP_UPDATE_INFO', false, $obj);
+			Cache::getLibrary()->set('APP_UPDATE_INFO', false, $obj);
 
 		} else {
 			$obj->version = APP_VERSION;
