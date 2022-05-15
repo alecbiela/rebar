@@ -59,19 +59,8 @@ class Concrete5_Model_Config extends ConcreteObject {
 	* @param bool $getFullObject
 	* @return string or full object $cv
 	*/
-	public function get($cfKey, $getFullObject = false) {
-		$pkgID = null;
-		/*
-		 * We need to check that it is an instance of Concrete5_Model_Config
-		 * becuase Config::get() is called statically and if the object calling
-		 * Config::get() has a property $pkg that is an object we'll actually
-		 * get that instead of what we want
-		 */
-		if (isset($this) && $this instanceof Concrete5_Model_Config && is_object($this->pkg)) {
-			$pkgID = $this->pkg->getPackageID();
-		}
-		
-		$cv = self::getStore()->get($cfKey, $pkgID);
+	public static function get($cfKey, $getFullObject = false) {
+		$cv = self::getStore()->get($cfKey, null);
 
 		if (!$getFullObject) {
 			if (is_object($cv)) {
@@ -83,6 +72,25 @@ class Concrete5_Model_Config extends ConcreteObject {
 			return $cv;
 		}
 	}
+	/**
+	 * Instanced version of above get() to be package-aware
+	 */
+	public function getInPackage($cfKey, $getFullObject = false){
+		$pkgID = (is_object($this->pkg)) ? $this->pkg->getPackageID() : null;
+
+		$cv = Config::getStore()->get($cfKey, $pkgID);
+
+		if (!$getFullObject) {
+			if (is_object($cv)) {
+				$value = $cv->value;
+				unset($cv);
+				return $value;
+			}
+		} else {
+			return $cv;
+		}
+	}
+
 	/**
 	* gets a list of all the configs associated with a package
 	* @param package object $pkg
@@ -98,7 +106,7 @@ class Concrete5_Model_Config extends ConcreteObject {
 	}	
 	
 	// Misleading old functionname
-	public function getOrDefine($key, $defaultValue) {
+	public static function getOrDefine($key, $defaultValue) {
 		return self::getAndDefine($key, $defaultValue);
 	}
 	/**
@@ -107,7 +115,7 @@ class Concrete5_Model_Config extends ConcreteObject {
 	* @param string $key
 	* @param string $defaultValue
 	*/
-	public function getAndDefine($key, $defaultValue) {
+	public static function getAndDefine($key, $defaultValue) {
 		if (defined($key)) {
 			return;
 		}
@@ -123,27 +131,31 @@ class Concrete5_Model_Config extends ConcreteObject {
 	* Clears a gived config key
 	* @param string $cfKey
 	*/
-	public function clear($cfKey) {
-		$pkgID = null;
-		/*
-		 * See Config::get() for info on why instanceof is needed etc
-		 */
-		if (isset($this) && $this instanceof Concrete5_Model_Config && is_object($this->pkg)) {
-			$pkgID = $this->pkg->getPackageID();
-		}
-		self::getStore()->delete($cfKey, $pkgID);
+	public static function clear($cfKey) {
+		self::getStore()->delete($cfKey, null);
 	}
+	/**
+	 * Instanced version of above clear() to be package-aware
+	 */
+	public function clearInPackage($cfKey){
+		$pkgID = (is_object($this->pkg)) ? $this->pkg->getPackageID() : null;
+		Config::getStore()->delete($cfKey, $pkgID);
+	}
+
 	/**
 	* Saves a given value to a key
 	* @param string $cfkey
 	* @param string $cfValue
 	*/
-	public function save($cfKey, $cfValue) {
-		$pkgID = null;
-		if (isset($this) && is_object($this->pkg)) {
-			$pkgID = $this->pkg->getPackageID();
-		}
-		self::getStore()->set($cfKey, $cfValue, $pkgID);
+	public static function save($cfKey, $cfValue) {
+		self::getStore()->set($cfKey, $cfValue, null);
+	}
+	/**
+	 * Instanced version of above save() to be package-aware
+	 */
+	public function saveInPackage($cfKey, $cfValue){
+		$pkgID = (is_object($this->pkg)) ? $this->pkg->getPackageID() : null;
+		Config::getStore()->set($cfKey, $cfValue, $pkgID);
 	}
 
 	public static function exportList($x) {

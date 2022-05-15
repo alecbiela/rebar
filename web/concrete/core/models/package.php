@@ -443,7 +443,7 @@ class Concrete5_Model_Package extends ConcreteObject {
 						case 'ConfigValue':
 							$co = new Config();
 							$co->setPackageObject($this);
-							$co->clear($item->key);
+							$co->clearInPackage($item->key);
 							break;
 						case 'AttributeKeyCategory':
 						case 'PermissionKeyCategory':
@@ -767,19 +767,19 @@ class Concrete5_Model_Package extends ConcreteObject {
 	public function config($cfKey, $getFullObject = false) {
 		$co = new Config();
 		$co->setPackageObject($this);
-		return $co->get($cfKey, $getFullObject);
+		return $co->getInPackage($cfKey, $getFullObject);
 	}
 	
 	public function saveConfig($cfKey, $value) {
 		$co = new Config();
 		$co->setPackageObject($this);
-		return $co->save($cfKey, $value);
+		return $co->saveInPackage($cfKey, $value);
 	}
 
 	public function clearConfig($cfKey) {
 		$co = new Config();
 		$co->setPackageObject($this);
-		return $co->clear($cfKey);
+		return $co->clearInPackage($cfKey);
 	}
 	
 	public static function getAvailablePackages($filterInstalled = true) {
