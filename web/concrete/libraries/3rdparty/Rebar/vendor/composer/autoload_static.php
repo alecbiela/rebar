@@ -24,6 +24,10 @@ class ComposerStaticInit61f909741eae80390d921e7543e30aeb
     );
 
     public static $prefixLengthsPsr4 = array (
+        'W' => 
+        array (
+            'Webmozart\\Assert\\' => 17,
+        ),
         'S' => 
         array (
             'Symfony\\Polyfill\\Php81\\' => 23,
@@ -77,11 +81,20 @@ class ComposerStaticInit61f909741eae80390d921e7543e30aeb
         ),
         'L' => 
         array (
+            'Laminas\\Validator\\' => 18,
+            'Laminas\\Stdlib\\' => 15,
+            'Laminas\\Mime\\' => 13,
+            'Laminas\\Mail\\' => 13,
+            'Laminas\\Loader\\' => 15,
             'Laminas\\Code\\' => 13,
         ),
         'J' => 
         array (
             'JamesHeinrich\\GetID3\\' => 21,
+        ),
+        'I' => 
+        array (
+            'Interop\\Container\\' => 18,
         ),
         'E' => 
         array (
@@ -98,6 +111,10 @@ class ComposerStaticInit61f909741eae80390d921e7543e30aeb
     );
 
     public static $prefixDirsPsr4 = array (
+        'Webmozart\\Assert\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/webmozart/assert/src',
+        ),
         'Symfony\\Polyfill\\Php81\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php81',
@@ -278,6 +295,26 @@ class ComposerStaticInit61f909741eae80390d921e7543e30aeb
         array (
             0 => __DIR__ . '/..' . '/friendsofphp/proxy-manager-lts/src/ProxyManager',
         ),
+        'Laminas\\Validator\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/laminas/laminas-validator/src',
+        ),
+        'Laminas\\Stdlib\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/laminas/laminas-stdlib/src',
+        ),
+        'Laminas\\Mime\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/laminas/laminas-mime/src',
+        ),
+        'Laminas\\Mail\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/laminas/laminas-mail/src',
+        ),
+        'Laminas\\Loader\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/laminas/laminas-loader/src',
+        ),
         'Laminas\\Code\\' => 
         array (
             0 => __DIR__ . '/..' . '/laminas/laminas-code/src',
@@ -285,6 +322,10 @@ class ComposerStaticInit61f909741eae80390d921e7543e30aeb
         'JamesHeinrich\\GetID3\\' => 
         array (
             0 => __DIR__ . '/..' . '/james-heinrich/getid3/src',
+        ),
+        'Interop\\Container\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/container-interop/container-interop/src/Interop/Container',
         ),
         'Egulias\\EmailValidator\\' => 
         array (

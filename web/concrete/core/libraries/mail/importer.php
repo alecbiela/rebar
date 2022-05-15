@@ -9,6 +9,10 @@
  *
  */
 
+use Laminas\Mail\Storage\Pop3;
+use Laminas\Mail\Storage\Imap;
+use Laminas\Mail\Storage\Message as EmailMessage;
+
 class Concrete5_Library_MailImporter extends ConcreteObject {
 
 	/**
@@ -194,13 +198,6 @@ class Concrete5_Library_MailImporter extends ConcreteObject {
 	public function getPendingMessages() {
 		$messages = array();
 		// connect to the server to grab all messages 
-		Loader::library('3rdparty/Zend/Exception');
-		if ($this->miConnectionMethod == 'IMAP') { 
-			Loader::library('3rdparty/Zend/Mail/Storage/Imap');
-		} else {
-			Loader::library('3rdparty/Zend/Mail/Storage/Pop3');
-		}
-		
 		$args = array('host' => $this->miServer, 'user' => $this->miUsername, 'password' => $this->miPassword);
 		if ($this->miEncryption != '') {
 			$args['ssl'] = $this->miEncryption;
@@ -210,9 +207,9 @@ class Concrete5_Library_MailImporter extends ConcreteObject {
 		}
 		
 		if ($this->miConnectionMethod == 'IMAP') {
-			$mail = new Zend_Mail_Storage_Imap($args);
+			$mail = new Imap($args);
 		} else { 
-			$mail = new Zend_Mail_Storage_Pop3($args);
+			$mail = new Pop3($args);
 		}
 		$i = 1;
 		foreach($mail as $m) {
@@ -248,7 +245,7 @@ class MailImportedMessage {
 	protected $oMailMessage;
 	protected $oMailCnt;
 	
-	public function __construct($mail, Zend_Mail_Message $msg, $count) {
+	public function __construct($mail, EmailMessage $msg, $count) {
 		
 		try {
 			$this->subject = $msg->subject;
@@ -278,7 +275,7 @@ class MailImportedMessage {
 							$foundPart = $part;
 							break;
 						}
-					} catch (Zend_Mail_Exception $e) {
+					} catch (Exception $e) {
 						// ignore
 					}
 				}

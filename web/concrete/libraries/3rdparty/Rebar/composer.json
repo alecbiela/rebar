@@ -14,7 +14,8 @@
         "symfony/intl": "5.4.x-dev",
         "symfony/validator": "5.4.x-dev",
         "adodb/adodb-php": "5.22",
-        "symfony/cache": "5.4.x-dev"
+        "symfony/cache": "5.4.x-dev",
+        "laminas/laminas-mail": "2.17.x-dev"
     },
     "license": "MIT",
     "authors": [
