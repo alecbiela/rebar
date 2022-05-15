@@ -46,9 +46,6 @@
 	## Set default permissions for new files and directories ##
 	require($cdir . '/startup/file_permission_config.php');
 
-	## Startup check, install ##
-	require($cdir . '/startup/magic_quotes_gpc_check.php');
-
 	## Default routes for various content items ##
 	require($cdir . '/config/theme_paths.php');
 
