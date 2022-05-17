@@ -119,7 +119,7 @@ class Concrete5_Model_PermissionAccess extends ConcreteObject {
 			foreach($filterEntities as $ent) {
 				$filters[] = $ent->getAccessEntityID();
 			}
-			$peIDs .= 'and peID in (' . implode($filters, ',') . ')';
+			$peIDs .= 'and peID in (' . implode(',', $filters) . ')';
 		}
 		if ($accessType == 0) {
 			$accessType = '';

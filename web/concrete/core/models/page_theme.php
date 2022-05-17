@@ -470,7 +470,7 @@ class Concrete5_Model_PageTheme extends ConcreteObject {
 	 * @param string $ptHandle
 	 * @return PageTheme
 	 */
-	public function getByHandle($ptHandle) {
+	public static function getByHandle($ptHandle) {
 		$where = 'ptHandle = ?';
 		$args = array($ptHandle);
 		$pt = PageTheme::populateThemeQuery($where, $args);
@@ -481,14 +481,14 @@ class Concrete5_Model_PageTheme extends ConcreteObject {
 	 * @param int $ptID
 	 * @return PageTheme
 	 */
-	public function getByID($ptID) {
+	public static function getByID($ptID) {
 		$where = 'ptID = ?';
 		$args = array($ptID);
 		$pt = PageTheme::populateThemeQuery($where, $args);
 		return $pt;
 	}
 	
-	protected function populateThemeQuery($where, $args) {
+	protected static function populateThemeQuery($where, $args) {
 		$db = Loader::db();
 		$row = $db->GetRow("select ptID, ptHandle, ptDescription, pkgID, ptName from PageThemes where {$where}", $args);
 		if ($row['ptID']) {

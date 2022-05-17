@@ -79,7 +79,7 @@
 		/** 
 		 * Loads an element from C5 or the site
 		 */
-		public function element($_file, $args = null, $_pkgHandle= null) {
+		public static function element($_file, $args = null, $_pkgHandle= null) {
 			if (is_array($args)) {
 				$collisions = array_intersect(array('_file', '__file', '__function', '_pkgHandle'), array_keys($args));
 				if ($collisions) {
@@ -249,7 +249,7 @@
 		 * Loads the various files for the database abstraction layer. We would bundle these in with the db() method below but
 		 * these need to be loaded before the models which need to be loaded before db() 
 		 */
-		public function database() {
+		public static function database() {
 			global $ADODB_NEWCONNECTION;
 			$ADODB_NEWCONNECTION = 'c5_db_driver';
 			function& c5_db_driver($driver){
@@ -425,7 +425,7 @@
 		/** 
 		 * Gets the path to a particular page type controller
 		 */
-		public function pageTypeControllerPath($ctHandle) {			
+		public static function pageTypeControllerPath($ctHandle) {			
 			self::model('collection_types');
 			$ct = CollectionType::getByHandle($ctHandle);
 			if (!is_object($ct)) {

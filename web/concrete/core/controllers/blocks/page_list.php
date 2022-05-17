@@ -108,8 +108,8 @@
 			if ($row['ctID']) {
 				$pl->filterByCollectionTypeID($row['ctID']);
 			}
-			
-			$columns = $db->MetaColumns(CollectionAttributeKey::getIndexedSearchTable());
+			$cak = new CollectionAttributeKey();
+			$columns = $db->MetaColumns($cak->getIndexedSearchTable());
 			if (isset($columns['AK_EXCLUDE_PAGE_LIST'])) {
 				$pl->filter(false, '(ak_exclude_page_list = 0 or ak_exclude_page_list is null)');
 			}

@@ -101,7 +101,7 @@
 			return $con;
 		}
 		
-		public function getChildPages($c) {
+		public static function getChildPages($c) {
 		
 			// a quickie
 			$db = Loader::db();
