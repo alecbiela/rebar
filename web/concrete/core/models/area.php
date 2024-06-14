@@ -25,6 +25,7 @@ class Concrete5_Model_Area extends ConcreteObject {
 
 	public $cID, $arID, $arHandle;
 	public $c;
+	protected $arIsGlobal;
 
 	/* area-specific attributes */
 

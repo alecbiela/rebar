@@ -75,6 +75,13 @@ defined('C5_EXECUTE') or die("Access Denied.");
 	     * @var boolean
 		*/	
 		private $isEditingEnabled = true;
+
+		/**
+		 * is this a preview or not
+		 * @access private
+		 * @var boolean
+		 */
+		private $isPreview = false;
 		
 		/**
 		 * getInstance() grabs one instance of the view w/the singleton pattern
@@ -250,9 +257,9 @@ defined('C5_EXECUTE') or die("Access Denied.");
 		 */
 		public function getHeaderItems() {
 			//Combine items from all namespaces into one list
-			$a1 = (is_array($this->headerItems['CORE'])) ? $this->headerItems['CORE'] : array();
-			$a2 = (is_array($this->headerItems['VIEW'])) ? $this->headerItems['VIEW'] : array();
-			$a3 = (is_array($this->headerItems['CONTROLLER'])) ? $this->headerItems['CONTROLLER'] : array();
+			$a1 = (isset($this->headerItems['CORE']) && is_array($this->headerItems['CORE'])) ? $this->headerItems['CORE'] : array();
+			$a2 = (isset($this->headerItems['VIEW']) && is_array($this->headerItems['VIEW'])) ? $this->headerItems['VIEW'] : array();
+			$a3 = (isset($this->headerItems['CONTROLLER']) && is_array($this->headerItems['CONTROLLER'])) ? $this->headerItems['CONTROLLER'] : array();
 			
 			$items = array_merge($a1, $a2, $a3);
 			
@@ -268,10 +275,10 @@ defined('C5_EXECUTE') or die("Access Denied.");
 		 */
 		public function getFooterItems() {
 			//Combine items from all namespaces into one list
-			$a1 = (is_array($this->footerItems['CORE'])) ? $this->footerItems['CORE'] : array();
-			$a2 = (is_array($this->footerItems['VIEW'])) ? $this->footerItems['VIEW'] : array();
-			$a3 = (is_array($this->footerItems['CONTROLLER'])) ? $this->footerItems['CONTROLLER'] : array();
-			$a4 = (is_array($this->footerItems['SCRIPT'])) ? $this->footerItems['SCRIPT'] : array();
+			$a1 = (isset($this->footerItems['CORE']) && is_array($this->footerItems['CORE'])) ? $this->footerItems['CORE'] : array();
+			$a2 = (isset($this->footerItems['VIEW']) && is_array($this->footerItems['VIEW'])) ? $this->footerItems['VIEW'] : array();
+			$a3 = (isset($this->footerItems['CONTROLLER']) && is_array($this->footerItems['CONTROLLER'])) ? $this->footerItems['CONTROLLER'] : array();
+			$a4 = (isset($this->footerItems['SCRIPT']) && is_array($this->footerItems['SCRIPT'])) ? $this->footerItems['SCRIPT'] : array();
 			
 			$items = array_merge($a1, $a2, $a3, $a4);
 			

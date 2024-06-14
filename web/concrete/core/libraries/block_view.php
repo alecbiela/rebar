@@ -16,6 +16,7 @@ defined('C5_EXECUTE') or die("Access Denied.");
 		protected $block;
 		protected $area;
 		protected $blockObj;
+		protected $hasRendered;
 		
 		/**
 		 * Includes a file from the core elements directory. Used by the CMS.

@@ -522,7 +522,7 @@
 			}
 			
 			if (!isset($controller)) {
-				if ($class && class_exists($class)) {
+				if (isset($class) && class_exists($class)) {
 					// now we get just the filename for this guy, so we can extrapolate
 					// what our controller is named
 					$controller = new $class($item);

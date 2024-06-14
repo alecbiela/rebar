@@ -531,7 +531,7 @@ defined('C5_EXECUTE') or die("Access Denied.");
 		}
 
 		$styles = $this->vObj->getCustomAreaStyles();		
-		$csrID = $styles[$area->getAreaHandle()];
+		$csrID = (isset($styles) && is_array($styles) && isset($styles[$area->getAreaHandle()])) ? $styles[$area->getAreaHandle()] : 0;
 		
 		if ($csrID > 0) {
 			$txt = Loader::helper('text');
