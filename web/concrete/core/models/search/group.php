@@ -72,7 +72,7 @@ class Concrete5_Model_GroupSearch extends DatabaseItemList {
 	}
 	
 	function __construct() {
-		$this->setQuery("select Groups.gID, Groups.gName, Groups.gDescription from Groups");
+		$this->setQuery("select `Groups`.gID, `Groups`.gName, `Groups`.gDescription from `Groups`");
 		$this->sortBy('gName', 'asc');
 	}
 	
