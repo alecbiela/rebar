@@ -233,4 +233,4 @@ Loader::registerAutoload($classes);
 spl_autoload_register(array('Loader', 'autoload'), true);
 
 /* NEW - Autoload the Rebar framework */
-require_once('concrete/libraries/3rdparty/Rebar/vendor/autoload.php');
+require_once(__DIR__.'/../libraries/3rdparty/Rebar/vendor/autoload.php');
