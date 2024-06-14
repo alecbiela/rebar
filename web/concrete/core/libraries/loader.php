@@ -445,6 +445,7 @@
 		public static function controller($item) {
 			
 			$include = false;
+			$path = '';
 			
 			if (is_string($item)) {
 				$db = self::db();

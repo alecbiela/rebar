@@ -51,7 +51,12 @@ class Concrete5_Model_AttributeValueList extends ConcreteObject implements Itera
 
 class Concrete5_Model_AttributeValue extends ConcreteObject {
 	
-	protected $attributeType;
+	protected $attributeType = null;
+	protected $attributeKey = null;
+	protected $avID = null;
+	protected $uID = null;
+	protected $avDateAdded = null;
+	protected $atID = null;
 	
 	public static function getByID($avID) {
 		$av = new AttributeValue();
@@ -63,7 +68,7 @@ class Concrete5_Model_AttributeValue extends ConcreteObject {
 	
 	protected function load($avID) {
 		$db = Loader::db();
-		$row = $db->GetRow("select avID, akID, uID, avDateAdded, atID from AttributeValues where avID = ?", array($avID));
+		$row = $db->GetRow("select avID, akID, uID, avDateAdded, atID from `AttributeValues` where avID = ?", array($avID));
 		if (is_array($row) && $row['avID'] == $avID) {
 			$this->setPropertiesFromArray($row);
 		}
@@ -105,7 +110,7 @@ class Concrete5_Model_AttributeValue extends ConcreteObject {
 	public function delete() {
 		$this->attributeType->controller->deleteValue();
 		$db = Loader::db();	
-		$db->Execute('delete from AttributeValues where avID = ?', $this->getAttributeValueID());
+		$db->Execute('delete from `AttributeValues` where avID = ?', $this->getAttributeValueID());
 	}
 	
 	public function getAttributeKey() {

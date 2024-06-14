@@ -434,7 +434,7 @@ class Concrete5_Model_FileManagerAvailableColumnSet extends Concrete5_Model_File
 
 class Concrete5_Model_FileManagerColumnSet extends DatabaseItemListColumnSet {
 	protected $attributeClass = 'FileAttributeKey';
-	public function getCurrent() {
+	public static function getCurrent() {
 		$u = new User();
 		$fldc = $u->config('FILE_LIST_DEFAULT_COLUMNS');
 		if ($fldc != '') {

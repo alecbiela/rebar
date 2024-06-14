@@ -2,6 +2,10 @@
 defined('C5_EXECUTE') or die("Access Denied.");
 class Concrete5_Model_AttributeKey extends ConcreteObject {
 
+	protected $akID = null;
+	protected $akHandle = null;
+	protected $akCategoryID = null;
+
 	public static function __callStatic($name, $arguments) {
 		switch (strtolower($name)) {
 			case 'getlist':

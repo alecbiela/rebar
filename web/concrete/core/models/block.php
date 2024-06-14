@@ -24,12 +24,13 @@ defined('C5_EXECUTE') or die("Access Denied.");
 */
 class Concrete5_Model_Block extends ConcreteObject {
 
-	var $cID;
-	var $arHandle;
-	var $c;
+	public $cID;
+	public $arHandle;
+	public $c;
 	protected $csrID;
 	protected $proxyBlock = false;
 	protected $bIncludeInComposerIsSet = false;
+	protected $bActionCID = null;
 
 	public static function populateManually($blockInfo, $c, $a) {
 		$b = new Block;

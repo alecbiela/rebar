@@ -21,6 +21,8 @@ defined('C5_EXECUTE') or die("Access Denied.");
  *
  */
 	class Concrete5_Library_View extends ConcreteObject {
+
+		private $c;
 			
 		/**
 		 * @var string

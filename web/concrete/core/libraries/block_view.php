@@ -197,6 +197,7 @@ defined('C5_EXECUTE') or die("Access Denied.");
 			$outputContent = false;
 			$useCache = false;
 			$page = Page::getCurrentPage();
+			$_filename = null;
 			
 			if ($view == 'view') {
 				if (ENABLE_BLOCK_CACHE && $this->controller->cacheBlockOutput() && ($obj instanceof Block)) {

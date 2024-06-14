@@ -65,7 +65,7 @@ class Concrete5_Model_Page extends Collection {
 		$v = array($cInfo);
 		$r = $db->query($q0 . $where, $v);
 		$row = $r->fetchRow();
-		if ($row['cPointerID'] > 0) {
+		if (is_array($row) && $row['cPointerID'] > 0) {
 			$q1 = $q0 . "where Pages.cID = ?";
 			$cPointerOriginalID = $row['cID'];
 			$v = array($row['cPointerID']);
@@ -78,7 +78,7 @@ class Concrete5_Model_Page extends Collection {
 		}
 	
 		if ($r) {
-			if ($row) {
+			if (is_array($row)) {
 				foreach ($row as $key => $value) {
 					$this->{$key} = $value;
 				}

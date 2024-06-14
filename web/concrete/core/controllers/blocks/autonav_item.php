@@ -15,6 +15,11 @@ defined('C5_EXECUTE') or die("Access Denied.");
 		protected $level;
 		protected $isActive = false;
 		protected $_c;
+		protected $cvDescription = null;
+		protected $cID = null;
+		protected $cPath = null;
+		protected $cPointerExternalLink = null;
+		protected $cvName = null;
 		public $hasChildren = false;
 		
 		/**

@@ -65,6 +65,7 @@ class ConcreteDashboardHelper {
 	public function getDashboardPaneHeaderWrapper($title = false, $help = false, $span = 'span12', $includeDefaultBody = true, $navigatePages = array(), $upToPage = false, $favorites = true) {
 		
 		$spantotal = 12;
+		$gridtotal = 12;
 		$offset = preg_match('/offset([0-9]+)/i', $span, $offsetmatches);
 		if ($offset) {
 			$offsettotal = $offsetmatches[1];

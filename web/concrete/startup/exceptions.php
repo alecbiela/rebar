@@ -14,9 +14,9 @@ function Concrete5_Exception_Handler($e) {
 	}
 
 	if (Config::get('SITE_DEBUG_LEVEL') == DEBUG_DISPLAY_ERRORS) {
-		View::renderError(t('An unexpected error occurred.'), $e->getMessage().' ('.$e->getFile().':'.$e->getLine().')', $e);		
+		View::getInstance()->renderError(t('An unexpected error occurred.'), $e->getMessage().' ('.$e->getFile().':'.$e->getLine().')', $e);		
 	} else {
-		View::renderError(t('An unexpected error occurred.'), t('An error occurred while processing this request.'), $e);
+		View::getInstance()->renderError(t('An unexpected error occurred.'), t('An error occurred while processing this request.'), $e);
 	}
 }
 
