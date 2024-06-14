@@ -3,3 +3,7 @@
 /build-tools
 .DS_Store
 .project
+Output.txt
+phpunit-5.phar
+phpunit-9.phar
+phpunit-10.phar

@@ -61,7 +61,9 @@ define('TESTUSER_JP_ID', $uTest->getUserID());
 
 // login the admin
 User::getByUserID(USER_SUPER_ID, true);
-Log::addEntry('bootsrapped','unit tests');
+Log::addEntry('bootstrapped','unit tests');
 
 // include adodb-lib to avoid a PHPUnit problem with globals
-include(ADODB_DIR.'/adodb-lib.inc.php');
+//include(ADODB_DIR.'/adodb-lib.inc.php');
+
+
