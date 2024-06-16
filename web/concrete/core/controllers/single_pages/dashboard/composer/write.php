@@ -232,6 +232,7 @@ class Concrete5_Controller_Dashboard_Composer_Write extends Controller {
 	}
 	
 	protected function setCollectionType($ctID) {
+		$ct = null;
 		if (intval($ctID) > 0) {
 			$ct = CollectionType::getByID($ctID);
 			if (is_object($ct)) {

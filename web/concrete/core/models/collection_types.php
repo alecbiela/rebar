@@ -115,7 +115,7 @@ class Concrete5_Model_CollectionType extends ConcreteObject
     {
         $db = Loader::db();
         $template_cID = $db->getOne(
-                           "SELECT Pages.cID FROM Pages inner join CollectionVersions cv on Pages.cID = cv.cID WHERE cIsTemplate = 1 and cv.ctID = ?",
+                           "SELECT Pages.cID FROM `Pages` inner join CollectionVersions cv on Pages.cID = cv.cID WHERE cIsTemplate = 1 and cv.ctID = ?",
                            array($this->ctID));
 
         if ($template_cID) {
@@ -125,17 +125,17 @@ class Concrete5_Model_CollectionType extends ConcreteObject
             }
         }
 
-        $db->query("DELETE FROM PageTypes WHERE ctID = ?", array($this->ctID));
-        $db->query("DELETE FROM PageTypeAttributes WHERE ctID = ?", array($this->ctID));
-        $db->query("DELETE FROM ComposerTypes WHERE ctID = ?", array($this->ctID));
-        $db->query("DELETE FROM ComposerContentLayout WHERE ctID = ?", array($this->ctID));
+        $db->query("DELETE FROM `PageTypes` WHERE ctID = ?", array($this->ctID));
+        $db->query("DELETE FROM `PageTypeAttributes` WHERE ctID = ?", array($this->ctID));
+        $db->query("DELETE FROM `ComposerTypes` WHERE ctID = ?", array($this->ctID));
+        $db->query("DELETE FROM `ComposerContentLayout` WHERE ctID = ?", array($this->ctID));
     }
 
-    public function getComposerPageTypes()
+    public static function getComposerPageTypes()
     {
         $db = Loader::db();
         $ctArray = array();
-        $r = $db->Execute('select ctID from ComposerTypes order by ctID asc');
+        $r = $db->Execute('select ctID from `ComposerTypes` order by ctID asc');
         while ($row = $r->FetchRow()) {
             $ct = CollectionType::getByID($row['ctID']);
             if (is_object($ct)) {

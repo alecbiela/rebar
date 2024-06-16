@@ -292,6 +292,8 @@ defined('C5_EXECUTE') or die("Access Denied.");
 		 */
 		public $controller;
 
+		protected $pkgHandle = null;
+
 		/**
 		 * Gets the BlockType object for the given Block Type Handle
 		 * ex:

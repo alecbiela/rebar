@@ -210,8 +210,8 @@
 		 */
 		public static function autoload($class) {
 			$classes = self::$autoloadClasses;
-			$cl = $classes[$class];
-			if ($cl) {
+			$cl = (isset($classes[$class])) ? $classes[$class] : null;
+			if (isset($cl)) {
 				call_user_func_array(array(__CLASS__, $cl[0]), array_slice($cl, 1, 2));
 			} else {
 				/* lets handle some things slightly more dynamically */				

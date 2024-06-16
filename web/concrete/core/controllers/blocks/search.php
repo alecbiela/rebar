@@ -136,6 +136,9 @@ class Concrete5_Controller_Block_Search extends BlockController {
 		//run query if display results elsewhere not set, or the cID of this page is set
 		if( !empty($_REQUEST['query']) || isset($_REQUEST['akID']) || isset($_REQUEST['month']))  {
 			$this->do_search();
+		} else {
+			$this->set('query', '');
+			$this->set('do_search', false);
 		}
 	}
 
