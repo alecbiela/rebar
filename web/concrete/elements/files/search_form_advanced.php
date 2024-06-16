@@ -1,6 +1,11 @@
-<?php defined('C5_EXECUTE') or die("Access Denied."); ?> 
-<?php
+<?php defined('C5_EXECUTE') or die("Access Denied.");
+
 Loader::model('file_set');
+Loader::model('file_attributes');
+$form = Loader::helper('form');
+$html = Loader::helper('html');
+$text = Loader::helper('text');
+$uh = Loader::helper('concrete/urls');
 
 $searchFields = array(
 	'' => '** ' . t('Fields'),
@@ -11,17 +16,9 @@ $searchFields = array(
 	'added_to' => t('Added to Page')
 );
 
-if ($_REQUEST['fType'] != false) {
-	unset($searchFields['type']);
-}
-if ($_REQUEST['fExtension'] != false) {
-	unset($searchFields['extension']);
-}
+if ($_REQUEST['fType'] != false) unset($searchFields['type']);
+if ($_REQUEST['fExtension'] != false) unset($searchFields['extension']);
 
-$html = Loader::helper('html');
-$text = Loader::helper('text');
-
-Loader::model('file_attributes');
 $searchFieldAttributes = FileAttributeKey::getSearchableList();
 foreach($searchFieldAttributes as $ak) {
 	$searchFields[$ak->getAttributeKeyID()] = $ak->getAttributeKeyDisplayName();
@@ -39,48 +36,45 @@ foreach($t1 as $value) {
 	$types[$value] = FileType::getGenericTypeText($value);
 }
 
-?>
-
-<?php $form = Loader::helper('form'); ?>
-	
-	<div id="ccm-<?php echo $searchInstance?>-search-field-base-elements" style="display: none">
+?>	
+	<div id="ccm-<?= $searchInstance?>-search-field-base-elements" style="display: none;">
 	
 		<span class="ccm-search-option" search-field="size">
-		<?php echo $form->text('size_from', array('style' => 'width: 30px'))?>
-		<?php echo t('to')?>
-		<?php echo $form->text('size_to', array('style' => 'width: 30px'))?>
-		KB
+			<?= $form->text('size_from', array('style' => 'width: 30px')); ?>
+			<?= t('to'); ?>
+			<?= $form->text('size_to', array('style' => 'width: 30px')); ?>
+			KB
 		</span>
 	
 		<span class="ccm-search-option"  search-field="type">
-		<?php echo $form->select('type', $types)?>
+			<?= $form->select('type', $types); ?>
 		</span>
 	
 		<span class="ccm-search-option"  search-field="extension">
-		<?php echo $form->select('extension', $extensions)?>
+			<?= $form->select('extension', $extensions); ?>
 		</span>
 
 		<span class="ccm-search-option ccm-search-option-type-date_time"  search-field="date_added">
-		<?php echo $form->text('date_from', array('style' => 'width: 86px'))?>
-		<?php echo t('to')?>
-		<?php echo $form->text('date_to', array('style' => 'width: 86px'))?>
+			<?= $form->text('date_from', array('style' => 'width: 86px')); ?>
+			<?= t('to'); ?>
+			<?= $form->text('date_to', array('style' => 'width: 86px')); ?>
 		</span>
 
 		<span class="ccm-search-option" search-field="added_to">
-		<div style="width: 100px">
-		<?php $ps = Loader::helper("form/page_selector");
-		print $ps->selectPage('ocIDSearchField');
-		?>
-		</div>
+			<div style="width: 100px">
+				<?php 
+					$ps = Loader::helper("form/page_selector");
+					print $ps->selectPage('ocIDSearchField');
+				?>
+			</div>
 		</span>
 		
 		<?php foreach($searchFieldAttributes as $sfa) { 
 			$sfa->render('search'); ?>
 		<?php } ?>
-		
 	</div>
 
-	<form method="get" class="form-horizontal" id="ccm-<?php echo $searchInstance?>-advanced-search" action="<?php echo REL_DIR_FILES_TOOLS_REQUIRED?>/files/search_results">
+	<form method="get" class="form-horizontal" id="ccm-<?php echo $searchInstance?>-advanced-search" action="<?= $uh->getToolsURL('files/search_results'); ?>">
 	<?php if ($_REQUEST['fType'] != false) {
 		$showTypes = array();
 		if(is_array($_REQUEST['fType'])) {

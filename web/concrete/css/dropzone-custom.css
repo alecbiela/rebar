@@ -1,0 +1,62 @@
+.dropzone.dz-upload-multiple{
+    position: relative;
+    border: 2px dashed rgba(0,0,0,0.3);
+    background-color: #fff;
+    transition: background-color 500ms ease;
+    padding: 10px;
+    height: 285px;
+    overflow-y: auto;
+    margin-top: 15px;
+}
+.dropzone.dz-upload-multiple:hover{
+    background-color: rgba(0, 116, 204, 0.1);
+}
+.dropzone.dz-upload-multiple .dz-message{
+    position: absolute;
+    width: 320px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    margin: 0;
+    font-size: 21px;
+    line-height: 23px;
+}
+.dropzone.dz-upload-multiple .dz-message.dz-default{color: #444;}
+
+.dz-upload-multiple .dz-preview{
+    margin: 5px;
+    border: 1px solid #d1d1d1;
+}
+
+.dz-upload-multiple .dz-preview .dz-image{
+    border-radius: 0;
+    width: 110px;
+    height: 110px;
+}
+
+.dz-upload-multiple .dz-preview .dz-details{
+    padding: 3px;
+    text-align: left;
+    background: rgba(33,33,33, 0.9);
+    transition: all 300ms ease;
+    height: 100%;
+    color: white;
+}
+
+.dz-upload-multiple .dz-preview .dz-details .dz-size{margin-bottom: 5px; padding-top: 5px;}
+
+.dz-upload-multiple .dz-preview .dz-details .dz-filename span{
+    transition: all 300ms ease;
+}
+.dz-upload-multiple .dz-preview .dz-details .dz-size span, .dz-upload-multiple .dz-preview .dz-details .dz-filename span{
+    border-radius: 0; background: transparent; padding: 5px;
+}
+
+.dz-upload-multiple .dz-preview .dz-details .dz-filename:hover span{
+    background: white; color: #333;
+}
+
+.dz-upload-multiple .dz-preview .dz-success-mark svg g path{fill: rgb(0, 204, 34);}
+.dz-upload-multiple .dz-preview .dz-error-mark svg g path{fill: rgb(196, 47, 47);}
+.dz-upload-multiple .dz-preview .dz-progress{bottom: 0; left: 0; top: unset; margin: 0; border-radius: 0; width: 100%; height: 10px;}
+.dz-upload-multiple .dz-preview .dz-progress .dz-upload{background:rgb(0, 116, 204);}

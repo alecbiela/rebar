@@ -28,11 +28,13 @@ if ($disable_choose == 1) {
 }
 
 ob_start();
-Loader::element('files/search_results', array('ocID' => $ocID, 'searchInstance' => $searchInstance, 'searchRequest' => $searchRequest, 'columns' => $columns, 'searchType' => 'DIALOG', 'files' => $files, 'fileList' => $fileList)); $searchForm = ob_get_contents();
+Loader::element('files/search_results', array('ocID' => $ocID, 'searchInstance' => $searchInstance, 'searchRequest' => $searchRequest, 'columns' => $columns, 'searchType' => 'DIALOG', 'files' => $files, 'fileList' => $fileList)); 
+$searchForm = ob_get_contents();
 ob_end_clean();
 
 $v = View::getInstance();
 $v->outputHeaderItems();
+$uh = Loader::helper('concrete/urls');
 
 
 ?>
@@ -41,7 +43,7 @@ $v->outputHeaderItems();
 	<div id="ccm-<?php echo $searchInstance?>-overlay-wrapper">
 <?php } ?>
 <div id="ccm-<?php echo $searchInstance?>-search-overlay" class="ccm-ui">
-	<input type="hidden" name="dialogAction" value="<?php echo REL_DIR_FILES_TOOLS_REQUIRED?>/files/search_dialog?ocID=<?php echo $ocID?>&amp;searchInstance=<?php echo $searchInstance?>&amp;disable_choose=<?php echo $disable_choose?>" />
+	<input type="hidden" name="dialogAction" value="<?= $uh->getToolsURL('files/search_dialog'); ?>?ocID=<?php echo $ocID?>&amp;searchInstance=<?php echo $searchInstance?>&amp;disable_choose=<?php echo $disable_choose?>" />
 
 <div class="ccm-pane-options" id="ccm-<?php echo $searchInstance?>-pane-options">
 
