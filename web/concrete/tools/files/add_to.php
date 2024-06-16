@@ -7,6 +7,6 @@ if (!$fp->canAccessFileManager()) {
 	die(t("Unable to access the file manager."));
 }
 
-Loader::element('files/add_to_sets');
+Loader::element('files/add_to_sets', array());
 
 ?>
