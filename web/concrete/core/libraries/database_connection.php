@@ -20,7 +20,7 @@ class Concrete5_Library_DatabaseConnection extends ADODB_mysqli{
 	 *
 	 * @return ADOFieldObject[]|bool An array of info for each column, or false if it could not determine the info.
 	 */
-	function MetaColumns($table, $normalize = true) {
+	/*function MetaColumns($table, $normalize = true) {
 		$false = false;
 		if (!$this->metaColumnsSQL)
 			return $false;
@@ -29,15 +29,15 @@ class Concrete5_Library_DatabaseConnection extends ADODB_mysqli{
 		$save = $ADODB_FETCH_MODE;
 		$ADODB_FETCH_MODE = ADODB_FETCH_NUM;
 		if ($this->fetchMode !== false)
-			$savem = $this->SetFetchMode(false);
+			$savem = $this->SetFetchMode(false);*/
 		/*
 		* Return assoc array where key is column name, value is column type
 		*    [1] => int unsigned
 		*/
 
-		$SQL = "SELECT column_name, column_type
+		/*$SQL = "SELECT column_name, column_type
 				  FROM information_schema.columns
-				 WHERE table_schema='{$this->databaseName}'
+				 WHERE table_schema='{$this->database}'
 				   AND table_name='$table'";
 
 		$schemaArray = $this->getAssoc($SQL);
@@ -54,12 +54,12 @@ class Concrete5_Library_DatabaseConnection extends ADODB_mysqli{
 			$fld = new ADOFieldObject();
 			$fld->name = $rs->fields[0];
 			$type = $rs->fields[1];
-
+*/
 			/*
 			* Type from information_schema returns
 			* the same format in V8 mysql as V5
 			*/
-			$type = $schemaArray[strtolower($fld->name)];
+			/*$type = $schemaArray[strtolower($fld->name)];
 
 			// split type into type(length):
 			$fld->scale = null;
@@ -109,7 +109,7 @@ class Concrete5_Library_DatabaseConnection extends ADODB_mysqli{
 
 		$rs->close();
 		return $retarr;
-	}
+	}*/
 
     /**
      * Overriding the default Replace() since it tries to insert with mismatched col names
