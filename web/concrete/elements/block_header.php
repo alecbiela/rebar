@@ -1,6 +1,7 @@
 <?php 
 defined('C5_EXECUTE') or die("Access Denied.");
 $c = $b->getBlockCollectionObject();
+$a = (isset($a)) ? $a : null;
 if (!is_object($a)) {
 	$a = Area::get($c, $b->getAreaHandle());
 }

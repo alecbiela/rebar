@@ -23,9 +23,10 @@ class Concrete5_Controller_Dashboard_Reports_Logs extends Controller {
 		$this->set('title', t('Logs'));
 		$pageBase = View::url('/dashboard/reports/logs', 'view');
 		$paginator = Loader::helper('pagination');
-		
-		$total = Log::getTotal($_REQUEST['keywords'], $_REQUEST['logType']);
-		$paginator->init(intval($page), $total, $pageBase . '%pageNum%/?keywords=' . $_REQUEST['keywords'] . '&logType=' . $_REQUEST['logType'], 10);
+		$keywords = (isset($_REQUEST['keywords'])) ? $_REQUEST['keywords'] : '';
+		$logType = (isset($_REQUEST['logType'])) ? $_REQUEST['logType'] : '';
+		$total = Log::getTotal($keywords, $logType);
+		$paginator->init(intval($page), $total, $pageBase . '%pageNum%/?keywords=' . $keywords . '&logType=' . $logType, 10);
 		$limit=$paginator->getLIMIT();
 
 		$types = Log::getTypeList();
@@ -40,7 +41,7 @@ class Concrete5_Controller_Dashboard_Reports_Logs extends Controller {
 			}
 		}
 
-		$entries = Log::getList($_REQUEST['keywords'], $_REQUEST['logType'], $limit);
+		$entries = Log::getList($keywords, $logType, $limit);
 		$this->set('keywords', $keywords);
 		$this->set('pageBase', $pageBase);
 		$this->set('entries', $entries);

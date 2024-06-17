@@ -102,13 +102,15 @@ class Concrete5_Library_Log {
 	public static function getTotal($keywords, $type) {
 		$db = Loader::db();
 		if ($keywords != '') {
-			$kw = 'and logText like ' . $db->quote('%' . $keywords . '%');
+			$kw = 'AND logText LIKE ' . $db->quote('%' . $keywords . '%');
+		} else {
+			$kw = '';
 		}
 		if ($type != false) {
 			$v = array($type);
-			$r = $db->GetOne('select count(logID)  from Logs where logType = ? ' . $kw, $v);
+			$r = $db->GetOne('SELECT COUNT(logID) from `Logs` WHERE logType = ? ' . $kw, $v);
 		} else {
-			$r = $db->GetOne('select count(logID)  from Logs where 1=1 ' . $kw);
+			$r = $db->GetOne('SELECT COUNT(logID) from `Logs` WHERE 1=1 ' . $kw);
 		}
 		return $r;
 	}
@@ -120,6 +122,8 @@ class Concrete5_Library_Log {
 		$db = Loader::db();
 		if ($keywords != '') {
 			$kw = 'and logText like ' . $db->quote('%' . $keywords . '%');
+		} else {
+			$kw = '';
 		}
 		if ($type != false) {
 			$v = array($type);

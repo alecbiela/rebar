@@ -26,6 +26,8 @@ defined('C5_EXECUTE') or die("Access Denied.");
 		
 		public $cID;
 		protected $attributes = array();
+		protected $vObj;
+		protected $cHandle;
 		/* version specific stuff */
 
 		function loadVersionObject($cvID = 'ACTIVE') {
@@ -899,7 +901,7 @@ defined('C5_EXECUTE') or die("Access Denied.");
 			$db = Loader::db();
 			$dh = Loader::helper('date');
 			$cDate = $dh->getSystemDateTime(); 
-			$cDatePublic = ($data['cDatePublic']) ? $data['cDatePublic'] : $cDate;
+			$cDatePublic = (isset($data['cDatePublic'])) ? $data['cDatePublic'] : $cDate;
 			
 			if (isset($data['cID'])) {
 				$res = $db->query("insert into Collections (cID, cHandle, cDateAdded, cDateModified) values (?, ?, ?, ?)", array($data['cID'], $data['handle'], $cDate, $cDate));
@@ -917,7 +919,11 @@ defined('C5_EXECUTE') or die("Access Denied.");
 			if (isset($data['cvIsNew'])) {
 				$cvIsNew = $data['cvIsNew'];
 			}
-			$data['name'] = Loader::helper('text')->sanitize($data['name']);
+			if(isset($data['name'])) {
+				$data['name'] = Loader::helper('text')->sanitize($data['name']);
+			} else {
+				$data['name'] = '';
+			}
 			if (isset($this) && ($this instanceof Concrete5_Model_Page || $this instanceof Page)) {
 				$ptID = $this->getCollectionThemeID();
 			} else {
@@ -931,6 +937,8 @@ defined('C5_EXECUTE') or die("Access Denied.");
 
 			if ($res) {
 				// now we add a pending version to the collectionversions table
+				if(!isset($data['handle'])) $data['handle'] = '';
+				if(!isset($data['cDescription'])) $data['cDescription'] = '';
 				$v2 = array($newCID, 1, $ctID, $data['name'], $data['handle'], $data['cDescription'], $cDatePublic, $cDate, VERSION_INITIAL_COMMENT, $data['uID'], $cvIsApproved, $cvIsNew, $ptID);
 				$q2 = "insert into CollectionVersions (cID, cvID, ctID, cvName, cvHandle, cvDescription, cvDatePublic, cvDateCreated, cvComments, cvAuthorUID, cvIsApproved, cvIsNew, ptID) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 				$r2 = $db->prepare($q2);

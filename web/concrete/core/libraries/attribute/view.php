@@ -10,6 +10,8 @@ defined('C5_EXECUTE') or die("Access Denied.");
  *
  */
 	class Concrete5_Library_AttributeTypeView extends View {
+		protected $attributeValue;
+		protected $attributeKey;
 
 		protected function getValue() {return $this->attributeValue;}
 		protected function getAttributeKey() {return $this->attributeKey;}
@@ -64,6 +66,7 @@ defined('C5_EXECUTE') or die("Access Denied.");
 		}
 
 		protected function getIncludeFile($view) {
+			$file = null;
 			$atHandle = $this->attributeType->getAttributeTypeHandle();
 			if (file_exists(DIR_MODELS . '/' . DIRNAME_ATTRIBUTES . '/' . DIRNAME_ATTRIBUTE_TYPES . '/' . $atHandle . '/' . $view . '.php')) {
 				$file = DIR_MODELS . '/' . DIRNAME_ATTRIBUTES . '/' . DIRNAME_ATTRIBUTE_TYPES . '/' .  $atHandle . '/' . $view . '.php';
@@ -112,7 +115,7 @@ defined('C5_EXECUTE') or die("Access Denied.");
 			extract($this->controller->getHelperObjects());
 			$atHandle = $this->attributeType->getAttributeTypeHandle();
 
-			if (is_object($attributeKey)) {
+			if (isset($attributeKey) && is_object($attributeKey)) {
 				$this->controller->set('akID', $this->attributeKey->getAttributeKeyID());
 			}
 

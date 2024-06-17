@@ -698,7 +698,7 @@ class Concrete5_Model_PageTheme extends ConcreteObject {
 		$r = $db->query("update CollectionVersions inner join Pages on CollectionVersions.cID = Pages.cID left join Packages on Pages.pkgID = Packages.pkgID set CollectionVersions.ptID = ? where cIsTemplate = 0 and (Packages.pkgHandle <> 'core' or pkgHandle is null or CollectionVersions.ctID > 0)", array($this->ptID));
 	}
 	
-	public function getSiteTheme() {
+	public static function getSiteTheme() {
 		$c = Page::getByID(HOME_CID);
 		return PageTheme::getByID($c->getCollectionThemeID());
 	}

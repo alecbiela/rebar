@@ -13,6 +13,32 @@ class Concrete5_Model_Page extends Collection {
 
 	protected $blocksAliasedFromMasterCollection = null;
 	protected $cPointerOriginalID;
+	protected $childrenCIDArray = array();
+
+	/**
+	 * Defining a list of properties pulled from the getters and setters in this class
+	 * This is an approximate list, and access control may need to be altered later (default "protected")
+	 */
+	protected $cPointerExternalLink;
+	protected $cPointerID;
+	protected $cPointerExternalLinkNewWindow;
+	protected $cFilename;
+	protected $cParentID;
+	protected $isMasterCollection;
+	protected $cOverrideTemplatePermissions;
+	protected $cDisplayOrder;
+	protected $cInheritPermissionsFromCID;
+	protected $cInheritPermissionsFrom;
+	protected $cChildren;
+	protected $cIsActive;
+	protected $cCacheFullPageContent;
+	protected $cCacheFullPageContentOverrideLifetime;
+	protected $cCacheFullPageContentLifetimeCustom;
+	protected $pkgID;
+	protected $cIsSystemPage;
+	protected $cCheckedOutUID;
+	protected $cPath;
+	protected $uID;
 	
 	/**
 	 * @param string $path /path/to/page
@@ -1126,7 +1152,6 @@ class Concrete5_Model_Page extends Collection {
 	}
 
 	function getCollectionChildrenArray( $oneLevelOnly=0 ) {
-		$this->childrenCIDArray = array();
 		$this->_getNumChildren($this->cID,$oneLevelOnly);
 		return $this->childrenCIDArray;
 	}
@@ -1808,9 +1833,11 @@ class Concrete5_Model_Page extends Collection {
 		$db = Loader::db();
 		$q = "select CollectionVersions.cID, CollectionVersions.cvHandle, CollectionVersions.cvID, PagePaths.cID as cpcID from CollectionVersions left join PagePaths on (PagePaths.cID = CollectionVersions.cID) where CollectionVersions.cID = '{$cID}' and CollectionVersions.cvIsApproved = 1";
 		$r = $db->query($q);
-		if (!$r) return;
+		if (!isset($r)) return;
 
 		$row = $r->fetchRow();
+		if($row === false) return;
+
 		if (!$row['cvHandle']) {
 			$row['cvHandle'] = $row['cID'];
 		}
@@ -2097,9 +2124,9 @@ class Concrete5_Model_Page extends Collection {
 			$data['name'] = $data['cName'];
 		}
 		
-		if (!$data['cHandle']) {
+		if (!isset($data['cHandle'])) {
 			// make the handle out of the title
-			$handle = $txt->urlify($data['name']);
+			$handle = (isset($data['name'])) ? $txt->urlify($data['name']) : '';
 		} else {
 			$handle = $txt->urlify($data['cHandle']);
 		}
@@ -2107,7 +2134,7 @@ class Concrete5_Model_Page extends Collection {
 		$data['handle'] = $handle;
 		$dh = Loader::helper('date');
 		$cDate = $dh->getSystemDateTime();
-		$cDatePublic = ($data['cDatePublic']) ? $data['cDatePublic'] : null;		
+		$cDatePublic = (isset($data['cDatePublic'])) ? $data['cDatePublic'] : null;		
 		
 		$data['ctID'] = $ct->getCollectionTypeID();
 		if ($ct->getCollectionTypeHandle() == STACKS_PAGE_TYPE) {

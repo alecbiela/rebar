@@ -284,7 +284,7 @@ class Concrete5_Model_Area extends ConcreteObject {
 		$v = array($c->getCollectionID(), $arHandle);
 		$q = "select arID, arOverrideCollectionPermissions, arInheritPermissionsFromAreaOnCID, arIsGlobal from Areas where cID = ? and arHandle = ?";
 		$arRow = $db->getRow($q, $v);
-		if ($arRow['arID'] > 0) {
+		if (isset($arRow['arID']) && $arRow['arID'] > 0) {
 			$area = new Area($arHandle);
 
 			$area->arID = $arRow['arID'];
@@ -482,17 +482,18 @@ class Concrete5_Model_Area extends ConcreteObject {
 				}
 
 				// now we do the recursive rescan to see if any areas themselves override collection permissions
-
 				while ($cIDToCheck > 0) {
-					$row = $db->getRow("select c.cParentID, c.cID, a.arHandle, a.arOverrideCollectionPermissions, a.arID from Pages c inner join Areas a on (c.cID = a.cID) where c.cID = ? and a.arHandle = ?", array($cIDToCheck, $this->getAreaHandle()));
-					if ($row['arOverrideCollectionPermissions'] == 1) {
+					$row = $db->getRow("SELECT c.cParentID, c.cID, a.arHandle, a.arOverrideCollectionPermissions, a.arID FROM `Pages` c inner join `Areas` a on (c.cID = a.cID) where c.cID = ? and a.arHandle = ?", array($cIDToCheck, $this->getAreaHandle()));
+					if(empty($row)) break;
+
+					if (isset($row['arOverrideCollectionPermissions']) && $row['arOverrideCollectionPermissions'] == 1) {
 						break;
 					} else {
 						$cIDToCheck = $row['cParentID'];
 					}
 				}
 				
-				if (is_array($row)) {
+				if (is_array($row) && !empty($row)) {
 					if ($row['arOverrideCollectionPermissions'] && $row['cID'] > 0) {
 						// then that means we have successfully found a parent area record that we can inherit from. So we set
 						// out current area to inherit from that COLLECTION ID (not area ID - from the collection ID)

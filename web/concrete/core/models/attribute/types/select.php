@@ -150,6 +150,7 @@ class Concrete5_Controller_AttributeType_Select extends AttributeTypeController 
 		$this->load();
 		$options = $this->getSelectedOptions();
 		$selectedOptions = array();
+		$selectedOptionValues = array();
 		foreach($options as $opt) {
 			$selectedOptions[] = $opt->getSelectAttributeOptionID();
 			$selectedOptionValues[$opt->getSelectAttributeOptionID()] = $opt->getSelectAttributeOptionValue();

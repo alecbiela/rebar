@@ -31,7 +31,11 @@ if (isset($entry)) {
 
 	?>
 
-	<?php echo Loader::helper('concrete/dashboard')->getDashboardPaneHeaderWrapper(ucfirst($action) . ' ' . $ct->getCollectionTypeName(), false, false, false)?>
+	<?php 
+		if(!isset($action)) $action = '';
+		echo Loader::helper('concrete/dashboard')->getDashboardPaneHeaderWrapper(ucfirst($action) . ' ' . $ct->getCollectionTypeName(), false, false, false);
+	
+	?>
 	<form method="post" class="form-horizontal" enctype="multipart/form-data" action="<?php echo $this->action('save')?>" id="ccm-dashboard-composer-form">
 	<input type="hidden" name="ccm-publish-draft" value="0" />
 
@@ -154,7 +158,7 @@ if (isset($entry)) {
 	<?php if ($entry->isComposerDraft()) { 
 	$pp = new Permissions($entry);
 	?>
-		<?php if ($workflow) { ?>
+		<?php if (isset($workflow)) { ?>
 			<?php echo Loader::helper('concrete/interface')->submit(t('Submit to Workflow'), 'publish', 'right', 'primary')?>
 		<?php } else { ?>
 			<?php echo Loader::helper('concrete/interface')->submit(t('Publish Page'), 'publish', 'right', 'primary')?>
