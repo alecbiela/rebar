@@ -335,16 +335,22 @@ class Concrete5_Helper_Form {
 	}
 
 	/**
-	 * Renders a select field. First argument is the name of the field. Second is an associative array of key => display. Third argument is either the value of the field to be selected (and if it's blank we check post) or a misc. array of fields
-	 * @param string $key
+	 * Renders a select field.
+	 * @param string $key - Name attribute of the select element
+	 * @param array $optionValues - Assoc array of <option> elements in format (value => displayed text)
+	 * @param string|array $valueOrArray - Either a string of the option to be selected (matches a key in $optionValues) or an array of element attributes
+	 * @param array $miscFields - If $valueOrArray is an option value, this will contain the misc fields
 	 * @return $html
 	 */
 	public function select($key, $optionValues, $valueOrArray = false, $miscFields = array()) {
+		// Try to get the POST data for input element with name $key
 		$val = $this->getRequestValue($key);
+
 		if (is_array($val)) {
 			$valueOrArray = $val[0];
 		}
 
+		// Build the "name" and "id" attributes
 		if (substr($key, -2) == '[]') {
 			$_key = substr($key, 0, -2);
 			$id = $_key . $this->selectIndex;
@@ -353,17 +359,28 @@ class Concrete5_Helper_Form {
 			$id = $key;
 		}
 
+		// Check if a default value is specified
 		if (is_array($valueOrArray)) {
 			$miscFields = $valueOrArray;
 		} else {
 			$miscFields['ccm-passed-value'] = $valueOrArray;	
 		}
 
+		// Render opening of <select>
 		$str = '<select name="' . $key . '" id="' . $id . '" ' . $this->parseMiscFields('ccm-input-select', $miscFields) . '>';
 
+		// Loop through the <option> elements
 		foreach($optionValues as $k => $value) {
 			$selected = "";
-			if ((string)$valueOrArray === (string)$k  && !isset($_REQUEST[$_key]) || ($val !== false && $val == $k) || (is_array($_REQUEST[$_key]) && (in_array($k, $_REQUEST[$_key])))) {
+			// Mark this option as selected if:
+				// $valueOrArray is a value and it equals this option's value
+				// The POST data for this element was specified and it equals this option's value
+				// It's a multi-select and one of the selected options equals this option's value
+			if (
+				!is_array($valueOrArray) && (string)$valueOrArray === (string)$k && !isset($_REQUEST[$_key]) || 
+				($val !== false && $val == $k) || 
+				(isset($_REQUEST[$_key]) && is_array($_REQUEST[$_key]) && in_array($k, $_REQUEST[$_key]))
+			) {
 				$selected = 'selected="selected"';
 			}
 			$str .= '<option value="' . $k . '" ' . $selected . '>' . $value . '</option>';

@@ -43,14 +43,15 @@
 			$r = $db->query($q, $v);
 			$row = $r ? $r->FetchRow() : null;
 			$nu = null;
+
 			if ($row) {
 				$nu = new User();
-				$nu->uID = $row['uID'];
-				$nu->uName = $row['uName'];
-				$nu->uIsActive = $row['uIsActive'];
-				$nu->uDefaultLanguage = $row['uDefaultLanguage'];
-				$nu->uLastLogin = $row['uLastLogin'];
-				$nu->uTimezone = $row['uTimezone'];
+				$nu->uID = $row['uID'] ?? null;
+				$nu->uName = $row['uName'] ?? null;
+				$nu->uIsActive = $row['uIsActive'] ?? null;
+				$nu->uDefaultLanguage = $row['uDefaultLanguage'] ?? null;
+				$nu->uLastLogin = $row['uLastLogin'] ?? null;
+				$nu->uTimezone = $row['uTimezone'] ?? null;
 				$nu->uGroups = $nu->_getUserGroups(true);
 				$nu->superUser = ($nu->getUserID() == USER_SUPER_ID);
 				if ($login) {

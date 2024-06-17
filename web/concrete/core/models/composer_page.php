@@ -101,10 +101,10 @@ class Concrete5_Model_ComposerPage extends Page {
 		$this->activate();
 	}
 
-	public function getMyDrafts() {
+	public static function getMyDrafts() {
 		$db = Loader::db();
 		$u = new User();
-		$r = $db->Execute('select ComposerDrafts.cID from ComposerDrafts inner join Pages on ComposerDrafts.cID = Pages.cID inner join Collections on Collections.cID = Pages.cID where uID = ? order by cDateModified desc', array($u->getUserID()));
+		$r = $db->Execute('select ComposerDrafts.cID from `ComposerDrafts` inner join `Pages` on ComposerDrafts.cID = Pages.cID inner join `Collections` on Collections.cID = Pages.cID where uID = ? order by cDateModified desc', array($u->getUserID()));
 		$pages = array();
 		while ($row = $r->FetchRow()) {
 			$entry = ComposerPage::getByID($row['cID']);

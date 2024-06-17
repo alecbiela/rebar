@@ -35,6 +35,7 @@ if (isset($cp)) {
 	$u = new User();
 	$username = $u->getUserName();
 	$vo = $c->getVersionObject();
+	$cantCheckOut = false;
 
 	if ($c->isCheckedOut()) {
 		if (!$c->isCheckedOutByMe()) {

@@ -23,7 +23,7 @@ class Concrete5_Model_Page extends Collection {
 	protected $cPointerID;
 	protected $cPointerExternalLinkNewWindow;
 	protected $cFilename;
-	protected $cParentID;
+	public $cParentID;
 	protected $isMasterCollection;
 	protected $cOverrideTemplatePermissions;
 	protected $cDisplayOrder;
