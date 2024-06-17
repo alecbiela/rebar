@@ -1,7 +1,9 @@
 module.exports = function(grunt) {
-	var fs = require('fs');
+	'use strict';
 
-	var parameters = null;
+	const fs = require('fs');
+
+	let parameters = null;
 	if(fs.existsSync(__dirname + '/Gruntfile.parameters.js')) {
 		parameters = require(__dirname + '/Gruntfile.parameters.js');
 	}
@@ -13,23 +15,25 @@ module.exports = function(grunt) {
 		}
 	});
 	
-	var config = {};
+	let config = {};
 
 	config.DIR_REL = ('DIR_REL' in parameters) ? parameters.DIR_REL : '';
 	config.DIR_BASE = ('DIR_BASE' in parameters) ? parameters.DIR_BASE : '../web';
 
 	// Options for the generation of JavaScripts. See https://github.com/gruntjs/grunt-contrib-uglify
-	var jsOptions = {
+	const jsOptions = {
 		mangle: true,
 		beautify: false,
 		report: 'min',
-		preserveComments: false,
+		output: {
+			comments: false
+		},
 		banner: '',
 		footer: ''
 	};
 
 	// List of the JavaScripts to be generated
-	var js = {
+	const js = {
 		bootstrap: {
 			dest: '<%= DIR_BASE %>/concrete/js/bootstrap.js',
 			src: [
@@ -78,18 +82,20 @@ module.exports = function(grunt) {
 	};
 
 	// Options for the generation of the CSS files. See https://github.com/gruntjs/grunt-contrib-less
-	var cssOptions = {
-		ieCompat: true,
+	const cssOptions = {
+		compress: false,
 		optimization: null,
 		strictImports: false,
+		strictMath: false,
+		strictUnits: false,
 		syncImport: false,
 		dumpLineNumbers: false,
 		relativeUrls: false,
-		report: 'min'
+		sourceMap: false
 	};
 
 	// List of the CSS files to be generated
-	var css = {
+	const css = {
 		'<%= DIR_BASE %>/concrete/css/jquery.ui.css': '<%= DIR_BASE %>/concrete/css/ccm_app/build/jquery.ui.less',
 		'<%= DIR_BASE %>/concrete/css/jquery.rating.css': '<%= DIR_BASE %>/concrete/css/ccm_app/build/jquery.rating.less',
 		'<%= DIR_BASE %>/concrete/css/ccm.default.theme.css': '<%= DIR_BASE %>/concrete/css/ccm_app/build/ccm.default.theme.less',
@@ -105,17 +111,17 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-less');
 
 	// Now let's build the final configuration for Grunt.
-	var extend = require('util')._extend;
+	const extend = require('util')._extend;
 
 	// Let's define the uglify section (for generating JavaScripts)
-	var jsTargets = {release: [], debug: []};
+	let jsTargets = {release: [], debug: []};
 	config.uglify = {options: jsOptions};
-	for(var key in js) {
-		var target = {files: {}};
+	for(const key in js) {
+		let target = {files: {}};
 		target.files[js[key].dest] = js[key].src;
-		config.uglify[key + '_release'] = extend({options: {compress: {warnings: false}}}, target);
+		config.uglify[key + '_release'] = extend({options: {compress: {drop_console: false}}}, target);
 		jsTargets.release.push('uglify:' + key + '_release');
-		target.options = {compress: {warnings: true}};
+		target.options = {compress: {drop_console: true}};
 		target.options.sourceMap = js[key].dest + '.map';
 		target.options.sourceMappingURL = target.options.sourceMap.replace(/<%=\s*DIR_BASE\s*%>/g, '<%= DIR_REL %>');
 		target.options.sourceMapRoot = '<%= DIR_REL %>/';

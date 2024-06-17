@@ -1,16 +1,17 @@
 {
-	"name": "concrete5",
-	"version": "5.6.2",
+	"name": "rebar",
+	"version": "5.6.4.1",
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:concrete5/concrete5.git"
+		"url": "git@github.com:alecbiela/rebar.git"
 	},
 	"devDependencies": {
-		"grunt": "~0.4",
-		"grunt-contrib-uglify": "~0.2",
-		"grunt-contrib-less": "~0.7",
-		"grunt-contrib-cssmin": "~0.6",
-		"shelljs": "~0.2",
-		"download": "~0.1"
+		"download": "^8.0.0",
+		"grunt": "^1.6.1",
+		"grunt-contrib-cssmin": "^5.0.0",
+		"grunt-contrib-less": "^3.0.0",
+		"grunt-contrib-uglify": "^5.2.2",
+		"grunt-contrib-watch": "^1.1.0",
+		"shelljs": "^0.8.5"
 	}
 }
