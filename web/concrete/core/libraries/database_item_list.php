@@ -46,7 +46,7 @@ class Concrete5_Library_DatabaseItemList extends ItemList {
 	protected function setupAutoSort() {
 		if (count($this->autoSortColumns) > 0) {
 			$req = $this->getSearchRequest();
-			if (in_array($req[$this->queryStringSortVariable], $this->autoSortColumns)) {
+			if (isset($req[$this->queryStringSortVariable]) && in_array($req[$this->queryStringSortVariable], $this->autoSortColumns)) {
 				$this->sortBy($req[$this->queryStringSortVariable], $req[$this->queryStringSortDirectionVariable]);
 			}
 		}

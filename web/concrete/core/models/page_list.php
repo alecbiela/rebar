@@ -402,6 +402,8 @@ class Concrete5_Model_PageList extends DatabaseItemList {
 		if ($this->isIndexedSearch()) {
 			$db = Loader::db();
 			$ik = ', match(psi.cName, psi.cDescription, psi.content) against (' . $db->quote($this->indexedKeywords) . ') as cIndexScore ';
+		} else {
+			$ik = '';
 		}
 	
 		if (!$this->includeAliases) {
