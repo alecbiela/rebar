@@ -51,7 +51,7 @@
 		 * This is really only used for permissions mapping
 		 */
 		 
-		public function getGlobal() {
+		public static function getGlobal() {
 			$fs = new FileSet;
 			$fs->fsID = 0;
 			return $fs;

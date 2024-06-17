@@ -71,7 +71,7 @@ class Concrete5_Library_Marketplace {
 		return $token;	
 	}
 
-	public function getSiteToken() {
+	public static function getSiteToken() {
 		$token = Config::get('MARKETPLACE_SITE_TOKEN');
 		return $token;
 	}
@@ -124,7 +124,7 @@ class Concrete5_Library_Marketplace {
 						$connectMethod = 'view';
 						$csToken = Marketplace::generateSiteToken();
 					} else { 
-						$csToken = $this->getSiteToken();
+						$csToken = self::getSiteToken();
 					}
 				} else {
 					// new connection 
@@ -172,7 +172,7 @@ class Concrete5_Library_Marketplace {
 				$url = MARKETPLACE_URL_CHECKOUT;
 				$csiURL = urlencode(BASE_URL . DIR_REL);
 				$csiBaseURL = urlencode(BASE_URL);
-				$csToken = $this->getSiteToken();
+				$csToken = self::getSiteToken();
 				$url = $url . '/' . intval($mp->getProductBlockID(), 10) . '?ts=' . time() . '&csiBaseURL=' . $csiBaseURL . '&csiURL=' . $csiURL . '&csToken=' . $csToken;
 			}
 			$time = time();

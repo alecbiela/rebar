@@ -250,8 +250,7 @@ class Concrete5_Model_MarketplaceRemoteItemList extends ItemList {
 		$params['version'] = APP_VERSION;
 		$params['itemsPerPage'] = $this->itemsPerPage;
 		Loader::library("marketplace");
-		$mi = Marketplace::getInstance();
-		$params['csToken'] = $mi->getSiteToken();
+		$params['csToken'] = Marketplace::getSiteToken();
 		
 		if ($this->includeInstalledItems) {
 			$params['includeInstalledItems'] = 1;

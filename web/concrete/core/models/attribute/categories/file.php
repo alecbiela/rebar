@@ -31,7 +31,7 @@ class Concrete5_Model_FileAttributeKey extends AttributeKey {
 	 * against its object.
 	 * @return AttributeValueList
 	 */
-	public function getAttributes($fID, $fvID, $method = 'getValue') {
+	public static function getAttributes($fID, $fvID, $method = 'getValue') {
 		$db = Loader::db();
 		$values = $db->GetAll("select akID, avID from FileAttributeValues where fID = ? and fvID = ?", array($fID, $fvID));
 		$avl = new AttributeValueList();
