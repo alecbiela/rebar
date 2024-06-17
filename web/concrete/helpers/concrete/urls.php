@@ -71,6 +71,7 @@ class ConcreteUrlsHelper {
 	 * @return string $url
 	 */
 	public function getBlockTypeAssetsURL($bt, $file = false) {
+		$url = '';
 		$ff = '';
 		if ($file != false) {
 			$ff = '/' . $file;

@@ -75,11 +75,11 @@
 			}
 			
 			$hi = Loader::helper('file');
-			$fullpath = $this->mapSystemPath($prefix, $filename, $createDirectories, $base);
+			$fullpath = $this->mapSystemPath($prefix, $filename, false, $base);
 			if (!file_exists($fullpath)) {
 				$filename = $hi->replaceExtension($filename, 'jpg');
 			}
-			$path = $this->mapSystemPath($prefix, $filename, $createDirectories, $rel);
+			$path = $this->mapSystemPath($prefix, $filename, false, $rel);
 			return $path;
 		}
 		

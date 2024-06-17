@@ -26,6 +26,7 @@ defined('C5_EXECUTE') or die("Access Denied.");
 		protected $record; // blockrecord
 		protected $helpers = array('form');
 		protected static $sets;
+		protected $requestArray = false;
 		
 		protected $block;
 		protected $btDescription = "";
@@ -360,7 +361,7 @@ defined('C5_EXECUTE') or die("Access Denied.");
 
 		public function post($field = false, $defaultValue = null) {
 			// the only post that matters is the one for this attribute's name space
-			$req = ($this->requestArray == false) ? $_POST : $this->requestArray;
+			$req = ($this->requestArray === false) ? $_POST : $this->requestArray;
 			if (is_array($req['_bf'])) {
 				$identifier = $this->identifier;
 				$b = $this->getBlockObject();

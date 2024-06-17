@@ -188,7 +188,7 @@ class Concrete5_Controller_AttributeType_Select extends AttributeTypeController 
 	public function saveForm($data) {
 		$this->load();
 
-		if ($this->akSelectAllowOtherValues && is_array($data['atSelectNewOption'])) {
+		if ($this->akSelectAllowOtherValues && isset($data['atSelectNewOption']) && is_array($data['atSelectNewOption'])) {
 			$options = $this->getOptions();
 
 			foreach($data['atSelectNewOption'] as $newoption) {
@@ -209,12 +209,12 @@ class Concrete5_Controller_AttributeType_Select extends AttributeTypeController 
 			}
 		}
 
-		if(is_array($data['atSelectOptionID'])) {
+		if(isset($data['atSelectOptionID']) && is_array($data['atSelectOptionID'])) {
 			$data['atSelectOptionID'] = array_unique($data['atSelectOptionID']);
 		}
 		$db = Loader::db();
 		$db->Execute('delete from atSelectOptionsSelected where avID = ?', array($this->getAttributeValueID()));
-		if (is_array($data['atSelectOptionID'])) {
+		if (isset($data['atSelectOptionID']) && is_array($data['atSelectOptionID'])) {
 			foreach($data['atSelectOptionID'] as $optID) {
 				if ($optID > 0) {
 					$db->Execute('insert into atSelectOptionsSelected (avID, atSelectOptionID) values (?, ?)', array($this->getAttributeValueID(), $optID));

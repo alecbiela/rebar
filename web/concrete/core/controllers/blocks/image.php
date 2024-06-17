@@ -68,12 +68,13 @@
 		}
 		
 		public function save($args) {
-			$args['forceImageToMatchDimensions'] = ($args['forceImageToMatchDimensions'] != '') ? $args['forceImageToMatchDimensions'] : 0;
-			$args['fOnstateID'] = ($args['fOnstateID'] != '') ? $args['fOnstateID'] : 0;
-			$args['fID'] = ($args['fID'] != '') ? $args['fID'] : 0;
-			$args['maxWidth'] = (intval($args['maxWidth']) > 0) ? intval($args['maxWidth']) : 0;
-			$args['maxHeight'] = (intval($args['maxHeight']) > 0) ? intval($args['maxHeight']) : 0;
-			switch (intval($args['linkType'])) {
+			$args['forceImageToMatchDimensions'] = isset($args['forceImageToMatchDimensions']) ? intval($args['forceImageToMatchDimensions']) : 0;
+			$args['fOnstateID'] = isset($args['fOnstateID']) ? intval($args['fOnstateID']) : 0;
+			$args['fID'] = isset($args['fID']) ? intval($args['fID']) : 0;
+			$args['maxWidth'] = (isset($args['maxWidth']) && intval($args['maxWidth']) > 0) ? intval($args['maxWidth']) : 0;
+			$args['maxHeight'] = (isset($args['maxHeight']) && intval($args['maxHeight']) > 0) ? intval($args['maxHeight']) : 0;
+			if(isset($args['linkType'])){
+				switch (intval($args['linkType'])) {
 				case 1:
 					$args['externalLink'] = '';
 					break;
@@ -84,8 +85,10 @@
 					$args['externalLink'] = '';
 					$args['internalLinkCID'] = 0;
 					break;
+				}
+				unset($args['linkType']); //this doesn't get saved to the database (it's only for UI usage)
 			}
-			unset($args['linkType']); //this doesn't get saved to the database (it's only for UI usage)
+
 			parent::save($args);
 		}
 

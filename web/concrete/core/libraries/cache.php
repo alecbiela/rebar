@@ -174,7 +174,7 @@ class Concrete5_Library_Cache {
 				$r = $obj;
 			}
 			$loc->setValue(Cache::key($type, $id), $r);
-		}
+		} else $r = null;
 		$cache = Cache::getLibrary()->getAdapter();
 		if (is_null($cache)) return false;
 
@@ -182,7 +182,7 @@ class Concrete5_Library_Cache {
 		//to delete the key preemptively as the value won't be updated if it's not expired
 		$key = Cache::key($type, $id);
 		$cache->delete($key);
-		$cache->get($key, function(ItemInterface $item){
+		$cache->get($key, function(ItemInterface $item) use ($expire, $r){
 			if($expire !== false) $item->expiresAfter($expire);
 			$item->tag('master_cache');
 

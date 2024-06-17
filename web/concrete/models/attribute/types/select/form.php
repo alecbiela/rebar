@@ -97,7 +97,7 @@ if (isset($akSelectAllowMultipleValues) && $akSelectAllowMultipleValues &&
     <script type="text/javascript">
         //<![CDATA[
         $(function () {
-            var availableTags = <?php echo $json->encode($opt_values);?>;
+            var availableTags = <?php echo $json->encode($akSelectValues ?? array());?>;
             $("#newAttrValueRows<?php echo $attrKeyID?>").autocomplete({
                 source: "<?php echo $this->action('load_autocomplete_values')?>",
                 select: function (event, ui) {

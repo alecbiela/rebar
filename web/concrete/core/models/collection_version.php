@@ -60,7 +60,7 @@
 			$row = $db->GetRow($q, $v);
 			$cv = new CollectionVersion();
 
-			if (is_array($row) && $row['cvID']) {
+			if (is_array($row) && isset($row['cvID'])) {
 				$cv->setPropertiesFromArray($row);
 			}
 

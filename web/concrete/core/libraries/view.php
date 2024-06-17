@@ -84,6 +84,20 @@ defined('C5_EXECUTE') or die("Access Denied.");
 		 * @var boolean
 		 */
 		private $isPreview = false;
+
+		/**
+		 * The path to the theme that this view originates from
+		 * @access private
+		 * @var string
+		 */
+		private $themePath = '';
+
+		/**
+		 * Directory of current theme for use when loading an element
+		 * @access private
+		 * @var string
+		 */
+		private $themeDir = '';
 		
 		/**
 		 * getInstance() grabs one instance of the view w/the singleton pattern
